@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Note</string>
-    <string name="make_note">Создать заметку</string>
+    <string name="app_name">Notes</string>
+    <string name="make_note">New note</string>
 </resources>

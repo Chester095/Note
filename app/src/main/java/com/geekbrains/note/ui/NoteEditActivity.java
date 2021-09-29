@@ -1,8 +1,10 @@
-package com.geekbrains.note;
+package com.geekbrains.note.ui;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.geekbrains.note.R;
 
 public class NoteEditActivity extends AppCompatActivity {
 
