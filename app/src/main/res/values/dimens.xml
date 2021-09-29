@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="title_vh_text_size">27sp</dimen>
+    <dimen name="description_vh_text_size">18sp</dimen>
+    <dimen name="padding_vh">16dp</dimen>
+</resources>

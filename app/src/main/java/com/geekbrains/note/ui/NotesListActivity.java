@@ -53,11 +53,17 @@ public class NotesListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+        adapter.setData(notesRepo.getNotes());
+        adapter.setOnItemClickListener(this::onItemClick);
     }
 
     private void initToolbar() {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
+
+    private void onItemClick(NoteEntity item){
+        openNoteScreen();
     }
 
     private void openNoteScreen() {
