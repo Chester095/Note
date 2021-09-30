@@ -3,4 +3,5 @@
     <dimen name="title_vh_text_size">27sp</dimen>
     <dimen name="description_vh_text_size">18sp</dimen>
     <dimen name="padding_vh">16dp</dimen>
+    <dimen name="margin_note_edit">16dp</dimen>
 </resources>

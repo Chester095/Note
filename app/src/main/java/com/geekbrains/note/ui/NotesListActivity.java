@@ -1,6 +1,7 @@
 package com.geekbrains.note.ui;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,7 +44,7 @@ public class NotesListActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.new_note_menu) {
-            openNoteScreen();
+            openNoteScreen(null);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -53,8 +54,9 @@ public class NotesListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        adapter.setData(notesRepo.getNotes());
         adapter.setOnItemClickListener(this::onItemClick);
+
+        adapter.setData(notesRepo.getNotes());
     }
 
     private void initToolbar() {
@@ -63,11 +65,12 @@ public class NotesListActivity extends AppCompatActivity {
     }
 
     private void onItemClick(NoteEntity item){
-        openNoteScreen();
+        openNoteScreen(item);
     }
 
-    private void openNoteScreen() {
+    private void openNoteScreen(@Nullable NoteEntity item) {
         Intent intent = new Intent(this, NoteEditActivity.class);
+//        intent.putExtra("note", item);
         startActivity(intent);
     }
 
