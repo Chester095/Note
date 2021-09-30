@@ -21,26 +21,38 @@ public class NotesListActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
+
     private NotesRepo notesRepo = new NotesRepoImpl();
-    private NotesAdapter adapter = new NotesAdapter();
+    private NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes_list);
-
         fillRepoByTestValues();
-
         initToolbar();
         initRecycler();
     }
 
+    /*** Чтобы наш активити узнал о существовании меню.
+     * Создание меню.
+     * Инфлейтор заходит в notes_list_menu, пройдётся по ней
+     * и для каждой создаст пункт меню и добавит в menu
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.notes_list_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
+    /***Реакция на нажатие кнопки меню.
+     * У нас есть элемент на который нажали. Проверяем тот ли это элемент.
+     * И выполняем openNoteScreen.
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.new_note_menu) {
@@ -50,30 +62,46 @@ public class NotesListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*** Инициализация recyclerView
+     * recyclerView состоит из сам recyclerView, адаптер и вьюшки
+     */
     private void initRecycler() {
         recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
-        adapter.setOnItemClickListener(this::onItemClick);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this)); // способ расположение заметок в recyclerView друг относительно друга (вертикальный список)
+        recyclerView.setAdapter(adapter); // определяем адаптер
+        adapter.setOnItemClickListener(this::onItemClick); //
 
-        adapter.setData(notesRepo.getNotes());
+        adapter.setData(notesRepo.getNotes()); // передаём данные из репозитория в адаптер
     }
 
+    /*** Инициализация Toolbar
+     *
+     */
     private void initToolbar() {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 
+
     private void onItemClick(NoteEntity item){
         openNoteScreen(item);
     }
 
+    /*** Запуск NoteEditActivity активити
+     *
+     * @param item
+     */
     private void openNoteScreen(@Nullable NoteEntity item) {
         Intent intent = new Intent(this, NoteEditActivity.class);
+        // todo
 //        intent.putExtra("note", item);
         startActivity(intent);
     }
 
+
+    /*** Временное наполнение репозитория заметками
+     * создаём и тут же записываем в репозиторий
+     */
     private void fillRepoByTestValues() {
         notesRepo.createNote(new NoteEntity("Заметка 1", "какой-то длинный текст очень тывалодлывоапо"));
         notesRepo.createNote(new NoteEntity("Заметка 2", "какой-то длинный текст очень тывалодлывоапо"));

@@ -2,6 +2,9 @@ package com.geekbrains.note.domain;
 
 import androidx.annotation.Nullable;
 
+/*** Класс с элементами заметки
+ *
+ */
 public class NoteEntity {
     @Nullable
     private Integer id;

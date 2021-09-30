@@ -9,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.geekbrains.note.R;
 import com.geekbrains.note.domain.NoteEntity;
 
+/***
+ *
+ */
 public class NoteEditActivity extends AppCompatActivity {
 
     private EditText titleEditText;
