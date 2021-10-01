@@ -26,14 +26,16 @@ public class NoteEditActivity extends AppCompatActivity {
         initNoteEdit();
 
 //        getIntent().get
+//        isEditMod или нет
 
+        // создаём новый Entity и что с ней должны сделать
         saveButton.setOnClickListener(view -> {
             NoteEntity noteEntity = new NoteEntity(
                     titleEditText.getText().toString(),
                     descriptionEditText.getText().toString()
             );
-            setResult(RESULT_OK);
-            // todo 02:14:00
+//            setResult(RESULT_OK, noteEntity..);
+            // todo 02:14:00 - написать что сделать
         });
     }
 

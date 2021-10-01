@@ -10,9 +10,9 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:padding="6dp"
         app:cardBackgroundColor="@color/teal_200"
-        app:cardCornerRadius="16dp"
+        app:cardCornerRadius="@dimen/card_view_corner_radius"
         app:cardElevation="8dp"
         app:cardUseCompatPadding="true">
 
@@ -36,6 +36,7 @@
                 android:id="@+id/description_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
                 android:maxLines="2"
                 android:textSize="@dimen/description_vh_text_size"
                 android:textStyle="italic" />

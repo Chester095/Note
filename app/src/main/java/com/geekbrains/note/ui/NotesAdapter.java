@@ -4,14 +4,12 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-
 import com.geekbrains.note.domain.NoteEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/*** Адаптер для получения данныч и передачи в конкретную вьюшку
+/*** Адаптер для получения данных и передачи в конкретную вьюшку
  * Подробное описание 01:49:10
  * для работы с ViewHolder
  * напоминание: recyclerView состоит из сам recyclerView(вьюшка которая рисуется),
@@ -31,9 +29,9 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteVh> {
         notifyDataSetChanged(); // уведомляем адаптер, что изменились данные
     }
 
-    /*** Создание конкретного ViewHolder
-     *
-     * @param parent - в какой вьюшке "раздувать" (из xml создавать реальные представления)
+    /*** Создаём вьюшку
+     * и из неё делаем вьюхолдер
+     * @param parent
      * @param viewType
      * @return
      */
@@ -44,7 +42,8 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteVh> {
     }
 
     /*** Привязка
-     *
+     * когда скорлим лист кладём во вьюшки значения
+     * и меняем слушателя нажатий
      * @param holder - сам ViewHolder
      * @param position - "засунь туда данные"
      */
@@ -68,9 +67,13 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteVh> {
      */
     @Override
     public int getItemCount() {
-        return data.size(); // возращаем размер
+        return data.size();
     }
 
+    /*** Для пробрасывания в NoteListActivity (наверх) значения
+     * "сделали так сложно чтобы адаптер и вьюхолдер остались крайне тупыми"
+     * @param listener - должны "просетить" в нашей вьюшке
+     */
     public void setOnItemClickListener(OnItemClickListener listener) {
         clickListener = listener;
     }

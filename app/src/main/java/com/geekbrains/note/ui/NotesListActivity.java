@@ -69,7 +69,7 @@ public class NotesListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this)); // способ расположение заметок в recyclerView друг относительно друга (вертикальный список)
         recyclerView.setAdapter(adapter); // определяем адаптер
-        adapter.setOnItemClickListener(this::onItemClick); //
+        adapter.setOnItemClickListener(this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
 
         adapter.setData(notesRepo.getNotes()); // передаём данные из репозитория в адаптер
     }
@@ -82,7 +82,10 @@ public class NotesListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
-
+    /*** Реакция на нажатие элемента списка
+     *
+     * @param item - конкретная заметка, на которую нажали
+     */
     private void onItemClick(NoteEntity item){
         openNoteScreen(item);
     }
@@ -95,6 +98,7 @@ public class NotesListActivity extends AppCompatActivity {
         Intent intent = new Intent(this, NoteEditActivity.class);
         // todo
 //        intent.putExtra("note", item);
+
         startActivity(intent);
     }
 

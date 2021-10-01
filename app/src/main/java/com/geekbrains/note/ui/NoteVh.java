@@ -20,13 +20,15 @@ public class NoteVh extends RecyclerView.ViewHolder {
     private final TextView descriptionTextView = itemView.findViewById(R.id.description_text_view);
     private NoteEntity note;
 
-    /***
+    /*** конструктор
      *
-     * @param parent - вьюшка
+     * @param parent - вьюшка, которая должна отрисоваться
      * @param clickListener
      */
     public NoteVh(@NonNull ViewGroup parent, NotesAdapter.OnItemClickListener clickListener) {
+        //создали вьюшку и сразу заинфлейтели
         super(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_note, parent, false));
+        // один раз при создании установили кликЛистенер
         itemView.setOnClickListener(view -> clickListener.onItemClick(note));
     }
 
