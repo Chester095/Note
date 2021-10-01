@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -17,11 +18,14 @@ import com.geekbrains.note.domain.NoteEntity;
 import com.geekbrains.note.domain.NotesRepo;
 import com.geekbrains.note.impl.NotesRepoImpl;
 
+import java.io.Serializable;
+
 public class NotesListActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
 
+    static final String NAME_EXTRA_KEY = "NAME_EXTRA_KEY";
     private NotesRepo notesRepo = new NotesRepoImpl();
     private NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
 
@@ -96,9 +100,7 @@ public class NotesListActivity extends AppCompatActivity {
      */
     private void openNoteScreen(@Nullable NoteEntity item) {
         Intent intent = new Intent(this, NoteEditActivity.class);
-        // todo
-//        intent.putExtra("note", item);
-
+        intent.putExtra(NAME_EXTRA_KEY, item);
         startActivity(intent);
     }
 
@@ -107,8 +109,8 @@ public class NotesListActivity extends AppCompatActivity {
      * создаём и тут же записываем в репозиторий
      */
     private void fillRepoByTestValues() {
-        notesRepo.createNote(new NoteEntity("Заметка 1", "какой-то длинный текст очень тывалодлывоапо"));
-        notesRepo.createNote(new NoteEntity("Заметка 2", "какой-то длинный текст очень тывалодлывоапо"));
+        notesRepo.createNote(new NoteEntity("Заметка 1", "Заметка 1 какой-то длинный текст kjsdfl;khjsd;fklj;lkjsdf;lgkjkl;sdfjkdfочень тывалодлывоапо"));
+        notesRepo.createNote(new NoteEntity("Заметка 2", "Заметка 2 какой-то длинный текст очень тывалодлывоапо"));
         notesRepo.createNote(new NoteEntity("Заметка 3", "какой-то длинный текст очень тывалодлывоапо"));
         notesRepo.createNote(new NoteEntity("Заметка 4", "какой-то длинный текст очень тывалодлывоапо"));
         notesRepo.createNote(new NoteEntity("Заметка 5", "какой-то длинный текст очень тывалодлывоапо"));

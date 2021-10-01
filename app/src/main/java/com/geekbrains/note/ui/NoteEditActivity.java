@@ -1,5 +1,7 @@
 package com.geekbrains.note.ui;
 
+import static com.geekbrains.note.ui.NotesListActivity.NAME_EXTRA_KEY;
+
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +27,10 @@ public class NoteEditActivity extends AppCompatActivity {
         setContentView(R.layout.activity_note_edit);
         initNoteEdit();
 
-//        getIntent().get
+
+        NoteEntity noteEntity1 = getIntent().getParcelableExtra(NAME_EXTRA_KEY);
+        titleEditText.setText(noteEntity1.getTitle());
+        descriptionEditText.setText(noteEntity1.getDescription());
 //        isEditMod или нет
 
         // создаём новый Entity и что с ней должны сделать
@@ -34,7 +39,8 @@ public class NoteEditActivity extends AppCompatActivity {
                     titleEditText.getText().toString(),
                     descriptionEditText.getText().toString()
             );
-//            setResult(RESULT_OK, noteEntity..);
+
+            setResult(RESULT_OK, );
             // todo 02:14:00 - написать что сделать
         });
     }
