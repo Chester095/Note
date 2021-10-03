@@ -19,6 +19,12 @@ public class NoteEntity implements Parcelable {
         this.description = description;
     }
 
+    public NoteEntity(int id, String title, String description) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+    }
+
     protected NoteEntity(Parcel in) {
         if (in.readByte() == 0) {
             id = null;
@@ -62,7 +68,7 @@ public class NoteEntity implements Parcelable {
         this.description = description;
     }
 
-    public void setId(@Nullable Integer id){
+    public void setId(@Nullable Integer id) {
         this.id = id;
     }
 

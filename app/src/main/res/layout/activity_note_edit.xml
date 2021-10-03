@@ -25,7 +25,16 @@
         android:id="@+id/save_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="6dp"
         android:background="@color/teal_700"
         android:text="@string/save_button_text" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/delete_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:background="@color/teal_700"
+        android:text="@string/delete_button_text" />
 
 </LinearLayout>
