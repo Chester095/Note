@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_margin="@dimen/margin_note_edit"
     android:orientation="vertical"
-    tools:context=".ui.NotesListActivity">
+    tools:context=".ui.NotesListFragment">
 
     <EditText
         android:id="@+id/title_edit_text"

@@ -1,15 +1,22 @@
 package com.geekbrains.note.ui;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,7 +25,7 @@ import com.geekbrains.note.domain.NoteEntity;
 import com.geekbrains.note.domain.NotesRepo;
 import com.geekbrains.note.impl.NotesRepoImpl;
 
-public class NotesListActivity extends AppCompatActivity {
+public class NotesListFragment extends Fragment {
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
@@ -31,13 +38,19 @@ public class NotesListActivity extends AppCompatActivity {
     private NotesRepo notesRepo = new NotesRepoImpl();
     private NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notes_list);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        return inflater.inflate(R.layout.fragment_notes_list, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         fillRepoByTestValues();
         initToolbar();
         initRecycler();
+        super.onViewCreated(view, savedInstanceState);
     }
 
 
@@ -49,9 +62,9 @@ public class NotesListActivity extends AppCompatActivity {
      * @return
      */
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.notes_list_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.notes_list_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     /***Реакция на нажатие кнопки меню.
@@ -73,8 +86,8 @@ public class NotesListActivity extends AppCompatActivity {
      * recyclerView состоит из сам recyclerView, адаптер и вьюшки
      */
     private void initRecycler() {
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this)); // способ расположение заметок в recyclerView друг относительно друга (вертикальный список)
+        recyclerView = getView().findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext())); // способ расположение заметок в recyclerView друг относительно друга (вертикальный список)
         recyclerView.setAdapter(adapter); // определяем адаптер
         adapter.setOnItemClickListener(this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
 
@@ -86,8 +99,8 @@ public class NotesListActivity extends AppCompatActivity {
      *
      */
     private void initToolbar() {
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        toolbar = getView().findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 
     /*** Реакция на нажатие элемента списка
@@ -103,7 +116,7 @@ public class NotesListActivity extends AppCompatActivity {
      * @param item
      */
     private void openNoteScreen(@Nullable NoteEntity item) {
-        Intent intent = new Intent(this, NoteEditActivity.class);
+        Intent intent = new Intent(requireContext(), NoteEditActivity.class);
         intent.putExtra(NAME_EXTRA_KEY, item);
         if (item == null)
             startActivityForResult(intent, CREATE_NOTE);
@@ -112,7 +125,7 @@ public class NotesListActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             NoteEntity noteEntity = data.getParcelableExtra(BACK_NAME_EXTRA_KEY);

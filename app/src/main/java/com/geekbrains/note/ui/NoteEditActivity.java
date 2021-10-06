@@ -1,7 +1,7 @@
 package com.geekbrains.note.ui;
 
-import static com.geekbrains.note.ui.NotesListActivity.BACK_NAME_EXTRA_KEY;
-import static com.geekbrains.note.ui.NotesListActivity.NAME_EXTRA_KEY;
+import static com.geekbrains.note.ui.NotesListFragment.BACK_NAME_EXTRA_KEY;
+import static com.geekbrains.note.ui.NotesListFragment.NAME_EXTRA_KEY;
 
 import android.content.Intent;
 import android.os.Bundle;
