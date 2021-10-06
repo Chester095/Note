@@ -32,7 +32,7 @@ public class NoteEditActivity extends Fragment {
     private Button deleteButton;
     private int id;
     private NoteEntity noteEntity1;
-
+// TODO not working
 
     @Nullable
     @Override
