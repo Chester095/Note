@@ -24,7 +24,7 @@ import com.geekbrains.note.domain.NoteEntity;
 /***
  *
  */
-public class NoteEditActivity extends Fragment {
+public class NoteEditFragment extends Fragment {
 
     private EditText titleEditText;
     private EditText descriptionEditText;

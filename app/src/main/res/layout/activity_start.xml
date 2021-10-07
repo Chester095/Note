@@ -5,9 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".ui.StartActivity">
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_main"
-        android:name="com.geekbrains.note.ui.NotesListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

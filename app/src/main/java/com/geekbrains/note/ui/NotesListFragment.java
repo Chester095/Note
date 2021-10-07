@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +35,7 @@ public class NotesListFragment extends Fragment {
     static final String BACK_NAME_EXTRA_KEY = "BACK_NAME_EXTRA_KEY";
     static final int CREATE_NOTE = 1;
     static final int UPDATE_NOTE = 2;
+    private Button showSecondButton;
 
     private NotesRepo notesRepo = new NotesRepoImpl();
     private NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
@@ -51,6 +53,7 @@ public class NotesListFragment extends Fragment {
         initToolbar();
         initRecycler();
         super.onViewCreated(view, savedInstanceState);
+
     }
 
 
@@ -65,7 +68,9 @@ public class NotesListFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.notes_list_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
+
     }
+
 
     /***Реакция на нажатие кнопки меню.
      * У нас есть элемент на который нажали. Проверяем тот ли это элемент.
@@ -75,48 +80,24 @@ public class NotesListFragment extends Fragment {
      */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
         if (item.getItemId() == R.id.new_note_menu) {
+            NotesListFragment.this.requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.fragment_container_main, new NoteEditFragment())
+                    .commit();
             openNoteScreen(null);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /*** Инициализация recyclerView
-     * recyclerView состоит из сам recyclerView, адаптер и вьюшки
-     */
-    private void initRecycler() {
-        recyclerView = getView().findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext())); // способ расположение заметок в recyclerView друг относительно друга (вертикальный список)
-        recyclerView.setAdapter(adapter); // определяем адаптер
-        adapter.setOnItemClickListener(this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
-
-
-        adapter.setData(notesRepo.getNotes()); // передаём данные из репозитория в адаптер
-    }
-
-    /*** Инициализация Toolbar
-     *
-     */
-    private void initToolbar() {
-        toolbar = getView().findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-    }
-
-    /*** Реакция на нажатие элемента списка
-     *
-     * @param item - конкретная заметка, на которую нажали
-     */
-    private void onItemClick(NoteEntity item) {
-        openNoteScreen(item);
-    }
-
-    /*** Запуск NoteEditActivity активити
+    /*** Запуск NoteEditFragment активити
      *
      * @param item
      */
     private void openNoteScreen(@Nullable NoteEntity item) {
-        Intent intent = new Intent(requireContext(), NoteEditActivity.class);
+        Intent intent = new Intent(requireContext(), NoteEditFragment.class);
         intent.putExtra(NAME_EXTRA_KEY, item);
         if (item == null)
             startActivityForResult(intent, CREATE_NOTE);
@@ -141,6 +122,34 @@ public class NotesListFragment extends Fragment {
             }
         }
         initRecycler();
+    }
+
+    /*** Инициализация recyclerView
+     * recyclerView состоит из сам recyclerView, адаптер и вьюшки
+     */
+    private void initRecycler() {
+        recyclerView = getView().findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext())); // способ расположение заметок в recyclerView друг относительно друга (вертикальный список)
+        recyclerView.setAdapter(adapter); // определяем адаптер
+        adapter.setOnItemClickListener(this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
+        adapter.setData(notesRepo.getNotes()); // передаём данные из репозитория в адаптер
+    }
+
+    /*** Инициализация Toolbar
+     *
+     */
+    private void initToolbar() {
+        toolbar = getView().findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+
+    }
+
+    /*** Реакция на нажатие элемента списка
+     *
+     * @param item - конкретная заметка, на которую нажали
+     */
+    private void onItemClick(NoteEntity item) {
+        openNoteScreen(item);
     }
 
 
