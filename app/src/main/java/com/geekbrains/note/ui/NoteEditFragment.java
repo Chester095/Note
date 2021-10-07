@@ -1,11 +1,5 @@
 package com.geekbrains.note.ui;
 
-import static android.app.Activity.RESULT_CANCELED;
-import static android.app.Activity.RESULT_OK;
-import static com.geekbrains.note.ui.NotesListFragment.BACK_NAME_EXTRA_KEY;
-import static com.geekbrains.note.ui.NotesListFragment.NAME_EXTRA_KEY;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +9,9 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentResultListener;
 
 import com.geekbrains.note.R;
 import com.geekbrains.note.domain.NoteEntity;
@@ -26,13 +21,22 @@ import com.geekbrains.note.domain.NoteEntity;
  */
 public class NoteEditFragment extends Fragment {
 
+    public static final String IN_DATA_KEY = "IN_DATA_KEY";
+    static final String NAME_EXTRA_KEY = "NAME_EXTRA_KEY";
+    static final String BACK_DATA_KEY = "BACK_DATA_KEY";
+    static final String IN_NOTE_ENTITY_KEY = "IN_NOTE_ENTITY_KEY";
+    static final String NOTE_ENTITY_KEY = "NOTE_ENTITY_KEY";
+    static final String TYPE_OPERATION_KEY = "TYPE_OPERATION_KEY";
+    static final int CREATE_NOTE = 1;
+    static final int DELETE_NOTE = 2;
     private EditText titleEditText;
     private EditText descriptionEditText;
     private Button saveButton;
     private Button deleteButton;
     private int id;
     private NoteEntity noteEntity1;
-// TODO not working
+    private FragmentManager fragmentManager;
+
 
     @Nullable
     @Override
@@ -43,28 +47,33 @@ public class NoteEditFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        fragmentManager = requireActivity().getSupportFragmentManager();
         initNoteEdit();
-
-        noteEntity1 = getActivity().getIntent().getParcelableExtra(NAME_EXTRA_KEY);
-        if (noteEntity1 != null) {
-            id = noteEntity1.getId();
-            titleEditText.setText(noteEntity1.getTitle());
-            descriptionEditText.setText(noteEntity1.getDescription());
-        }
-
-        // создаём новый Entity и что с ней должны сделать
-        saveButton.setOnClickListener(this::onClickSaveButton);
-        deleteButton.setOnClickListener(this::onClickDeleteButton);
+        fillNoteData();
         super.onViewCreated(view, savedInstanceState);
     }
 
-
-    private void initNoteEdit() {
-        titleEditText = getView().findViewById(R.id.title_edit_text);
-        descriptionEditText = getView().findViewById(R.id.description_edit_text);
-        saveButton = getView().findViewById(R.id.save_button);
-        deleteButton = getView().findViewById(R.id.delete_button);
+    private void fillNoteData() {
+        fragmentManager.setFragmentResultListener(IN_DATA_KEY, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                if (result.getParcelable(IN_NOTE_ENTITY_KEY) != null) {
+                    noteEntity1 = result.getParcelable(IN_NOTE_ENTITY_KEY);
+                    id = noteEntity1.getId();
+                    titleEditText.setText(noteEntity1.getTitle());
+                    descriptionEditText.setText(noteEntity1.getDescription());
+                }
+            }
+        });
     }
+
+/*    public static NoteEditFragment newInstance(NoteEntity item) {
+        NoteEditFragment noteEditFragment = new NoteEditFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(NAME_EXTRA_KEY, item);
+        noteEditFragment.setArguments(bundle);
+        return noteEditFragment;
+    }*/
 
     private void onClickSaveButton(View view) {
         if (!titleEditText.getText().toString().equals("")) {
@@ -72,23 +81,37 @@ public class NoteEditFragment extends Fragment {
                     titleEditText.getText().toString(),
                     descriptionEditText.getText().toString()
             );
-            Intent data = new Intent();
-            data.putExtra(BACK_NAME_EXTRA_KEY, noteEntity);
-            getActivity().setResult(RESULT_OK, data);
-            getActivity().finish();
+
+            Bundle result = new Bundle();
+            result.putParcelable(NOTE_ENTITY_KEY, noteEntity);
+            result.putInt(TYPE_OPERATION_KEY, CREATE_NOTE);
+            fragmentManager.setFragmentResult(BACK_DATA_KEY, result);
         }
+
     }
 
     private void onClickDeleteButton(View view) {
+        Bundle result = new Bundle();
         if (noteEntity1 != null) {
             NoteEntity noteEntity = new NoteEntity(id,
                     titleEditText.getText().toString(),
                     descriptionEditText.getText().toString()
             );
-            Intent data = new Intent();
-            data.putExtra(BACK_NAME_EXTRA_KEY, noteEntity);
-            getActivity().setResult(RESULT_CANCELED, data);
+            result.putParcelable(NOTE_ENTITY_KEY, noteEntity);
+        } else {
+            result.putParcelable(NOTE_ENTITY_KEY, null);
         }
-        getActivity().finish();
+
+        result.putInt(TYPE_OPERATION_KEY, DELETE_NOTE);
+        fragmentManager.setFragmentResult(BACK_DATA_KEY, result);
+    }
+
+    private void initNoteEdit() {
+        titleEditText = getView().findViewById(R.id.title_edit_text);
+        descriptionEditText = getView().findViewById(R.id.description_edit_text);
+        saveButton = getView().findViewById(R.id.save_button);
+        deleteButton = getView().findViewById(R.id.delete_button);
+        saveButton.setOnClickListener(this::onClickSaveButton);
+        deleteButton.setOnClickListener(this::onClickDeleteButton);
     }
 }

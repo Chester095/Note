@@ -11,13 +11,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,13 +31,7 @@ public class NotesListFragment extends Fragment {
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
-
-    static final String NAME_EXTRA_KEY = "NAME_EXTRA_KEY";
-    static final String BACK_NAME_EXTRA_KEY = "BACK_NAME_EXTRA_KEY";
-    static final int CREATE_NOTE = 1;
-    static final int UPDATE_NOTE = 2;
-    private Button showSecondButton;
-
+    private FragmentManager fragmentManager;
     private NotesRepo notesRepo = new NotesRepoImpl();
     private NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
 
@@ -49,9 +44,11 @@ public class NotesListFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        fragmentManager = requireActivity().getSupportFragmentManager();
         fillRepoByTestValues();
         initToolbar();
         initRecycler();
+        closeNoteScreen();
         super.onViewCreated(view, savedInstanceState);
 
     }
@@ -68,9 +65,7 @@ public class NotesListFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.notes_list_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
     }
-
 
     /***Реакция на нажатие кнопки меню.
      * У нас есть элемент на который нажали. Проверяем тот ли это элемент.
@@ -80,12 +75,8 @@ public class NotesListFragment extends Fragment {
      */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
         if (item.getItemId() == R.id.new_note_menu) {
-            NotesListFragment.this.requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.fragment_container_main, new NoteEditFragment())
-                    .commit();
+
             openNoteScreen(null);
             return true;
         }
@@ -97,32 +88,41 @@ public class NotesListFragment extends Fragment {
      * @param item
      */
     private void openNoteScreen(@Nullable NoteEntity item) {
-        Intent intent = new Intent(requireContext(), NoteEditFragment.class);
-        intent.putExtra(NAME_EXTRA_KEY, item);
-        if (item == null)
-            startActivityForResult(intent, CREATE_NOTE);
-        else
-            startActivityForResult(intent, UPDATE_NOTE);
+        Bundle result = new Bundle();
+        result.putParcelable(NoteEditFragment.IN_NOTE_ENTITY_KEY, item);
+        fragmentManager.setFragmentResult(NoteEditFragment.IN_DATA_KEY, result);
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.fragment_container_main, new NoteEditFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            NoteEntity noteEntity = data.getParcelableExtra(BACK_NAME_EXTRA_KEY);
-            if (requestCode == CREATE_NOTE) {
-                notesRepo.createNote(noteEntity);
-            } else if (requestCode == UPDATE_NOTE) {
-                notesRepo.updateNote(noteEntity.getId(), noteEntity);
+    private void closeNoteScreen() {
+        fragmentManager.setFragmentResultListener(NoteEditFragment.BACK_DATA_KEY, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                NoteEntity noteEntity = result.getParcelable(NoteEditFragment.NOTE_ENTITY_KEY);
+                int operationType = result.getInt(NoteEditFragment.TYPE_OPERATION_KEY);
+                if (operationType == 1) saveNoteEntity(noteEntity);
+                else if (operationType == 2) deleteNoteEntity(noteEntity);
             }
-        } else if (resultCode == RESULT_CANCELED) {
-            if (requestCode == UPDATE_NOTE) {
-                NoteEntity noteEntity = data.getParcelableExtra(BACK_NAME_EXTRA_KEY);
-                notesRepo.deleteNote(noteEntity.getId());
-            }
-        }
+        });
         initRecycler();
     }
+
+
+    private void saveNoteEntity(NoteEntity noteEntity) {
+        if (noteEntity.getId() == 0)
+            notesRepo.createNote(noteEntity);
+        else
+            notesRepo.updateNote(noteEntity.getId(), noteEntity);
+    }
+
+    private void deleteNoteEntity(NoteEntity noteEntity) {
+        notesRepo.deleteNote(noteEntity.getId());
+    }
+
 
     /*** Инициализация recyclerView
      * recyclerView состоит из сам recyclerView, адаптер и вьюшки
@@ -156,8 +156,7 @@ public class NotesListFragment extends Fragment {
     /*** Временное наполнение репозитория заметками
      * создаём и тут же записываем в репозиторий
      */
-    private void fillRepoByTestValues
-    () {
+    private void fillRepoByTestValues() {
         notesRepo.createNote(new NoteEntity("Заметка 1", "Октябрь уж наступил — уж роща отряхает"));
         notesRepo.createNote(new NoteEntity("Заметка 2", "Последние листы с нагих своих ветвей;"));
         notesRepo.createNote(new NoteEntity("Заметка 3", "Дохнул осенний хлад — дорога промерзает."));

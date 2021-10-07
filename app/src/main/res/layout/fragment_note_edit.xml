@@ -2,16 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="@dimen/margin_note_edit"
+    android:layout_height="match_parent"
+
+    android:background="@color/white"
     android:orientation="vertical"
-    tools:context=".ui.NotesListFragment"
-    android:background="@color/white">
+    tools:context=".ui.NotesListFragment">
 
     <EditText
         android:id="@+id/title_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_note_edit"
         android:hint="@string/title_edit_text"
         android:textSize="@dimen/title_vh_text_size" />
 
@@ -19,6 +20,7 @@
         android:id="@+id/description_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_note_edit"
         android:hint="@string/description_edit_text"
         android:textSize="@dimen/description_vh_text_size" />
 
