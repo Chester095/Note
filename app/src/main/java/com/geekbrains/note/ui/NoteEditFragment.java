@@ -87,6 +87,7 @@ public class NoteEditFragment extends Fragment {
             result.putInt(TYPE_OPERATION_KEY, CREATE_NOTE);
             fragmentManager.setFragmentResult(BACK_DATA_KEY, result);
         }
+        closeNoteEditFragment();
 
     }
 
@@ -104,6 +105,11 @@ public class NoteEditFragment extends Fragment {
 
         result.putInt(TYPE_OPERATION_KEY, DELETE_NOTE);
         fragmentManager.setFragmentResult(BACK_DATA_KEY, result);
+        closeNoteEditFragment();
+    }
+
+    private void closeNoteEditFragment() {
+        fragmentManager.popBackStack();
     }
 
     private void initNoteEdit() {

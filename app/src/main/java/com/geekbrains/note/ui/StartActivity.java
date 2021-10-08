@@ -14,7 +14,7 @@ public class StartActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start);
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragment_container_main, new NotesListFragment())
+                .replace(R.id.fragment_container_main, new NotesListFragment())
                 .commit();
     }
 }

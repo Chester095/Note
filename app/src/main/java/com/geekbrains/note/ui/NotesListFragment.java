@@ -1,9 +1,5 @@
 package com.geekbrains.note.ui;
 
-import static android.app.Activity.RESULT_CANCELED;
-import static android.app.Activity.RESULT_OK;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,20 +31,34 @@ public class NotesListFragment extends Fragment {
     private NotesRepo notesRepo = new NotesRepoImpl();
     private NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        fillRepoByTestValues();
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
+
         return inflater.inflate(R.layout.fragment_notes_list, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        dataFromNoteEditFragment();
+        fragmentManager = requireActivity().getSupportFragmentManager();
+        initToolbar();
+        initRecycler();
+        super.onResume();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         fragmentManager = requireActivity().getSupportFragmentManager();
-        fillRepoByTestValues();
         initToolbar();
         initRecycler();
-        closeNoteScreen();
         super.onViewCreated(view, savedInstanceState);
 
     }
@@ -98,7 +108,7 @@ public class NotesListFragment extends Fragment {
                 .commit();
     }
 
-    private void closeNoteScreen() {
+    private void dataFromNoteEditFragment() {
         fragmentManager.setFragmentResultListener(NoteEditFragment.BACK_DATA_KEY, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
