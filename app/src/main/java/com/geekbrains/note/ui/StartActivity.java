@@ -1,17 +1,26 @@
 package com.geekbrains.note.ui;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.geekbrains.note.R;
+import com.geekbrains.note.domain.NoteEntity;
+import com.geekbrains.note.io.IoAdapter;
+import com.geekbrains.note.io.SaveFile;
 
 public class StartActivity extends AppCompatActivity {
+    private final String TAG = "@@@";
+    public static boolean firstOnCreate=true;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null)  firstOnCreate = false;
+        Log.d(TAG, "onCreateStartActivity.   savedInstanceState = " + savedInstanceState);
         setContentView(R.layout.activity_start);
         if (checkOrientation()) initLandscapeOrientation();
         else initPortraitOrientation();

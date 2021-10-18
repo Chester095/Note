@@ -17,7 +17,7 @@ public class NotesRepoImpl implements NotesRepo {
     private int counter = 0; // счётчик для списка cache
 
 
-    /*** возращает данные
+    /*** возвращает данные
      *
      * @return
      */

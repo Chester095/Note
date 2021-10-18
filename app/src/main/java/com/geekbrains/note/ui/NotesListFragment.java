@@ -1,6 +1,8 @@
 package com.geekbrains.note.ui;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,32 +24,41 @@ import com.geekbrains.note.R;
 import com.geekbrains.note.domain.NoteEntity;
 import com.geekbrains.note.domain.NotesRepo;
 import com.geekbrains.note.impl.NotesRepoImpl;
+import com.geekbrains.note.io.IoAdapter;
+import com.geekbrains.note.io.SaveFile;
 
 public class NotesListFragment extends Fragment {
+    private final String TAG = "@@@";
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private FragmentManager fragmentManager;
-    private NotesRepo notesRepo = new NotesRepoImpl();
-    private NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
+    public static final NotesRepo notesRepo = new NotesRepoImpl();
+    private final NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        fillRepoByTestValues();
+        if (StartActivity.firstOnCreate == true) {
+            new IoAdapter().readFromFile(SaveFile.readFromFile(getActivity().getApplicationContext()));
+        }
+        Log.d(TAG, "onCreate.   savedInstanceState = " + savedInstanceState
+                + "      firstOnCreate = " + StartActivity.firstOnCreate);
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        Log.d(TAG, "onCreateView.   savedInstanceState = " + savedInstanceState);
         return inflater.inflate(R.layout.fragment_notes_list, container, false);
     }
 
     @Override
     public void onResume() {
-        dataFromNoteEditFragment();
+        Log.d(TAG, "onResume.");
         fragmentManager = requireActivity().getSupportFragmentManager();
         initToolbar();
         initRecycler();
@@ -56,9 +67,11 @@ public class NotesListFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onViewCreated.   savedInstanceState = " + savedInstanceState);
         fragmentManager = requireActivity().getSupportFragmentManager();
         initToolbar();
         initRecycler();
+        dataFromNoteEditFragment();
         super.onViewCreated(view, savedInstanceState);
 
     }
@@ -69,6 +82,7 @@ public class NotesListFragment extends Fragment {
      * Инфлейтор заходит в notes_list_menu, пройдётся по ней
      * и для каждой создаст пункт меню и добавит в menu
      * @param menu
+     * @param inflater
      * @return
      */
     @Override
@@ -98,14 +112,24 @@ public class NotesListFragment extends Fragment {
      * @param item
      */
     private void openNoteScreen(@Nullable NoteEntity item) {
+        int container;
+        if (!checkOrientation()) {
+            container = R.id.fragment_container_main;
+        } else {
+            container = R.id.fragment_container_note_edit;
+        }
         Bundle result = new Bundle();
         result.putParcelable(NoteEditFragment.IN_NOTE_ENTITY_KEY, item);
         fragmentManager.setFragmentResult(NoteEditFragment.IN_DATA_KEY, result);
         fragmentManager
                 .beginTransaction()
-                .replace(R.id.fragment_container_main, new NoteEditFragment())
+                .replace(container, new NoteEditFragment())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private boolean checkOrientation() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     private void dataFromNoteEditFragment() {
@@ -114,18 +138,21 @@ public class NotesListFragment extends Fragment {
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
                 NoteEntity noteEntity = result.getParcelable(NoteEditFragment.NOTE_ENTITY_KEY);
                 int operationType = result.getInt(NoteEditFragment.TYPE_OPERATION_KEY);
-                if (operationType == 1) saveNoteEntity(noteEntity);
-                else if (operationType == 2) deleteNoteEntity(noteEntity);
+                if (operationType == 1)
+                    saveNoteEntity(noteEntity);
+                else if (operationType == 2)
+                    deleteNoteEntity(noteEntity);
             }
         });
-        initRecycler();
+//        initRecycler();
     }
 
 
     private void saveNoteEntity(NoteEntity noteEntity) {
-        if (noteEntity.getId() == 0)
+        if (noteEntity.getId() == 0) {
             notesRepo.createNote(noteEntity);
-        else
+            SaveFile.writeToFile(new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(),noteEntity.getDescription()), getActivity().getApplicationContext(),true);
+        } else
             notesRepo.updateNote(noteEntity.getId(), noteEntity);
     }
 
@@ -143,6 +170,7 @@ public class NotesListFragment extends Fragment {
         recyclerView.setAdapter(adapter); // определяем адаптер
         adapter.setOnItemClickListener(this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
         adapter.setData(notesRepo.getNotes()); // передаём данные из репозитория в адаптер
+        Log.d(TAG, "initRecycler.   notesRepo = " + notesRepo);
     }
 
     /*** Инициализация Toolbar
@@ -167,6 +195,8 @@ public class NotesListFragment extends Fragment {
      * создаём и тут же записываем в репозиторий
      */
     private void fillRepoByTestValues() {
+
+
         notesRepo.createNote(new NoteEntity("Заметка 1", "Октябрь уж наступил — уж роща отряхает"));
         notesRepo.createNote(new NoteEntity("Заметка 2", "Последние листы с нагих своих ветвей;"));
         notesRepo.createNote(new NoteEntity("Заметка 3", "Дохнул осенний хлад — дорога промерзает."));
@@ -177,5 +207,19 @@ public class NotesListFragment extends Fragment {
         notesRepo.createNote(new NoteEntity("Заметка 8", "И будит лай собак уснувшие дубравы."));
         notesRepo.createNote(new NoteEntity("Заметка 9", "Теперь моя пора: я не люблю весны;"));
         notesRepo.createNote(new NoteEntity("Заметка 10", "Скучна мне оттепель; вонь, грязь — весной я болен;"));
+    /*
+        SaveFile.writeToFile(new IoAdapter().saveToFile(0, "Заметка 1", "Октябрь уж наступил — уж роща отряхает"), getBaseContext(), false);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(1, "Заметка 2", "Последние листы с нагих своих ветвей;"), getBaseContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(2, "Заметка 3", "Дохнул осенний хлад — дорога промерзает."), getBaseContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(3, "Заметка 4", "Журча еще бежит за мельницу ручей,"), getBaseContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(4, "Заметка 5", "Но пруд уже застыл; сосед мой поспешает"), getBaseContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(5, "Заметка 6", "В отъезжие поля с охотою своей,"), getBaseContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(6, "Заметка 7", "И страждут озими от бешеной забавы,"), getBaseContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(7, "Заметка 8", "И будит лай собак уснувшие дубравы."), getBaseContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(8, "Заметка 9", "Теперь моя пора: я не люблю весны;"), getBaseContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(9, "Заметка 10", "Скучна мне оттепель; вонь, грязь — весной я болен;"), getBaseContext(), true);*/
+
+//        SaveFile.readFromFile(getBaseContext());
+
     }
 }
