@@ -1,5 +1,7 @@
 package com.geekbrains.note.ui;
 
+import static com.geekbrains.note.ui.StartActivity.LOG_TAG;
+
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,7 +30,6 @@ import com.geekbrains.note.io.IoAdapter;
 import com.geekbrains.note.io.SaveFile;
 
 public class NotesListFragment extends Fragment {
-    private final String TAG = "@@@";
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
@@ -43,7 +44,7 @@ public class NotesListFragment extends Fragment {
         if (StartActivity.firstOnCreate == true) {
             new IoAdapter().readFromFile(SaveFile.readFromFile(getActivity().getApplicationContext()));
         }
-        Log.d(TAG, "onCreate.   savedInstanceState = " + savedInstanceState
+        Log.d(LOG_TAG, "onCreate.   savedInstanceState = " + savedInstanceState
                 + "      firstOnCreate = " + StartActivity.firstOnCreate);
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
@@ -52,13 +53,13 @@ public class NotesListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView.   savedInstanceState = " + savedInstanceState);
+        Log.d(LOG_TAG, "onCreateView.   savedInstanceState = " + savedInstanceState);
         return inflater.inflate(R.layout.fragment_notes_list, container, false);
     }
 
     @Override
     public void onResume() {
-        Log.d(TAG, "onResume.");
+        Log.d(LOG_TAG, "onResume.");
         fragmentManager = requireActivity().getSupportFragmentManager();
         initToolbar();
         initRecycler();
@@ -67,7 +68,7 @@ public class NotesListFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onViewCreated.   savedInstanceState = " + savedInstanceState);
+        Log.d(LOG_TAG, "onViewCreated.   savedInstanceState = " + savedInstanceState);
         fragmentManager = requireActivity().getSupportFragmentManager();
         initToolbar();
         initRecycler();
@@ -144,16 +145,17 @@ public class NotesListFragment extends Fragment {
                     deleteNoteEntity(noteEntity);
             }
         });
-//        initRecycler();
     }
 
 
     private void saveNoteEntity(NoteEntity noteEntity) {
         if (noteEntity.getId() == 0) {
             notesRepo.createNote(noteEntity);
-            SaveFile.writeToFile(new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(),noteEntity.getDescription()), getActivity().getApplicationContext(),true);
-        } else
+            SaveFile.writeToFile(new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(), noteEntity.getDescription()), getActivity().getApplicationContext(), true);
+        } else {
             notesRepo.updateNote(noteEntity.getId(), noteEntity);
+            SaveFile.writeToFile(SaveFile.updateFile(), getActivity().getApplicationContext(), false);
+        }
     }
 
     private void deleteNoteEntity(NoteEntity noteEntity) {
@@ -170,7 +172,7 @@ public class NotesListFragment extends Fragment {
         recyclerView.setAdapter(adapter); // определяем адаптер
         adapter.setOnItemClickListener(this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
         adapter.setData(notesRepo.getNotes()); // передаём данные из репозитория в адаптер
-        Log.d(TAG, "initRecycler.   notesRepo = " + notesRepo);
+        Log.d(LOG_TAG, "initRecycler.   notesRepo = " + notesRepo);
     }
 
     /*** Инициализация Toolbar

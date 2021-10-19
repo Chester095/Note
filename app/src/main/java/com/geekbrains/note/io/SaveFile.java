@@ -1,7 +1,11 @@
 package com.geekbrains.note.io;
 
+import static com.geekbrains.note.ui.NotesListFragment.notesRepo;
+
 import android.content.Context;
 import android.util.Log;
+
+import com.geekbrains.note.domain.NoteEntity;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -11,6 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class SaveFile {
 
@@ -44,20 +49,14 @@ public class SaveFile {
         }
     }
 
-    public static boolean updateFile(String data, Context ctx) {
-        FileOutputStream fou;
-        try {
-            fou = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fou, StandardCharsets.UTF_8);
-//            Log.d(LOG_TAG, "writeToFile " + FILENAME + "  " + data);
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
-            return true;
-        } catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-            return false;
+    public static String updateFile() {
+        String temp = "";
+        List<NoteEntity> data = notesRepo.getNotes();
+        for (NoteEntity noteEntity : data) {
+            temp += new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(), noteEntity.getDescription());
         }
+        Log.d(LOG_TAG, temp);
+        return temp;
     }
 
     /***  Чтение из файла

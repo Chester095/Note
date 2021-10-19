@@ -11,18 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultListener;
 
 import com.geekbrains.note.R;
 import com.geekbrains.note.domain.NoteEntity;
 
-/***
- *
- */
+
 public class NoteEditFragment extends Fragment {
 
     public static final String IN_DATA_KEY = "IN_DATA_KEY";
-    static final String NAME_EXTRA_KEY = "NAME_EXTRA_KEY";
     static final String BACK_DATA_KEY = "BACK_DATA_KEY";
     static final String IN_NOTE_ENTITY_KEY = "IN_NOTE_ENTITY_KEY";
     static final String NOTE_ENTITY_KEY = "NOTE_ENTITY_KEY";
@@ -34,7 +30,7 @@ public class NoteEditFragment extends Fragment {
     private Button saveButton;
     private Button deleteButton;
     private int id;
-    private NoteEntity noteEntity1;
+    private NoteEntity noteEntityTemp;
     private FragmentManager fragmentManager;
 
 
@@ -54,26 +50,16 @@ public class NoteEditFragment extends Fragment {
     }
 
     private void fillNoteData() {
-        fragmentManager.setFragmentResultListener(IN_DATA_KEY, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                if (result.getParcelable(IN_NOTE_ENTITY_KEY) != null) {
-                    noteEntity1 = result.getParcelable(IN_NOTE_ENTITY_KEY);
-                    id = noteEntity1.getId();
-                    titleEditText.setText(noteEntity1.getTitle());
-                    descriptionEditText.setText(noteEntity1.getDescription());
-                }
+        fragmentManager.setFragmentResultListener(IN_DATA_KEY, this, (requestKey, result) -> {
+            if (result.getParcelable(IN_NOTE_ENTITY_KEY) != null) {
+                noteEntityTemp = result.getParcelable(IN_NOTE_ENTITY_KEY);
+                id = noteEntityTemp.getId();
+                titleEditText.setText(noteEntityTemp.getTitle());
+                descriptionEditText.setText(noteEntityTemp.getDescription());
             }
         });
     }
 
-/*    public static NoteEditFragment newInstance(NoteEntity item) {
-        NoteEditFragment noteEditFragment = new NoteEditFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(NAME_EXTRA_KEY, item);
-        noteEditFragment.setArguments(bundle);
-        return noteEditFragment;
-    }*/
 
     private void onClickSaveButton(View view) {
         if (!titleEditText.getText().toString().equals("")) {
@@ -93,7 +79,7 @@ public class NoteEditFragment extends Fragment {
 
     private void onClickDeleteButton(View view) {
         Bundle result = new Bundle();
-        if (noteEntity1 != null) {
+        if (noteEntityTemp != null) {
             NoteEntity noteEntity = new NoteEntity(id,
                     titleEditText.getText().toString(),
                     descriptionEditText.getText().toString()

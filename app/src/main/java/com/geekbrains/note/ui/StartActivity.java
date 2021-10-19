@@ -8,19 +8,16 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.geekbrains.note.R;
-import com.geekbrains.note.domain.NoteEntity;
-import com.geekbrains.note.io.IoAdapter;
-import com.geekbrains.note.io.SaveFile;
 
 public class StartActivity extends AppCompatActivity {
-    private final String TAG = "@@@";
+    public static final String LOG_TAG = "@@@";
     public static boolean firstOnCreate=true;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null)  firstOnCreate = false;
-        Log.d(TAG, "onCreateStartActivity.   savedInstanceState = " + savedInstanceState);
+        Log.d(LOG_TAG, "onCreateStartActivity.   savedInstanceState = " + savedInstanceState);
         setContentView(R.layout.activity_start);
         if (checkOrientation()) initLandscapeOrientation();
         else initPortraitOrientation();
