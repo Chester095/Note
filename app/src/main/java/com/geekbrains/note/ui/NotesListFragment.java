@@ -41,11 +41,11 @@ public class NotesListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        if (StartActivity.firstOnCreate == true) {
+        if (notesRepo.getNotes().isEmpty()) {
             new IoAdapter().readFromFile(SaveFile.readFromFile(getActivity().getApplicationContext()));
         }
         Log.d(LOG_TAG, "onCreate.   savedInstanceState = " + savedInstanceState
-                + "      firstOnCreate = " + StartActivity.firstOnCreate);
+                + "      notesRepo.getNotes().isEmpty() = " + notesRepo.getNotes().isEmpty());
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
     }
