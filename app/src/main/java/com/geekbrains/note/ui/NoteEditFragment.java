@@ -1,6 +1,10 @@
 package com.geekbrains.note.ui;
 
+import static com.geekbrains.note.ui.StartActivity.LOG_TAG;
+
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,12 +41,17 @@ public class NoteEditFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "NoteEditFragment  onCreateView.   container = " + container);
         return inflater.inflate(R.layout.fragment_note_edit, container, false);
     }
 
+    private boolean checkOrientation() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "NoteEditFragment  onViewCreated.   notesRepo = ");
         fragmentManager = requireActivity().getSupportFragmentManager();
         initNoteEdit();
         fillNoteData();
@@ -50,6 +59,7 @@ public class NoteEditFragment extends Fragment {
     }
 
     private void fillNoteData() {
+        Log.d(LOG_TAG, "NoteEditFragment  fillNoteData");
         fragmentManager.setFragmentResultListener(IN_DATA_KEY, this, (requestKey, result) -> {
             if (result.getParcelable(IN_NOTE_ENTITY_KEY) != null) {
                 noteEntityTemp = result.getParcelable(IN_NOTE_ENTITY_KEY);
@@ -62,6 +72,7 @@ public class NoteEditFragment extends Fragment {
 
 
     private void onClickSaveButton(View view) {
+        Log.d(LOG_TAG, "NoteEditFragment  onClickSaveButton");
         if (!titleEditText.getText().toString().equals("")) {
             NoteEntity noteEntity = new NoteEntity(id,
                     titleEditText.getText().toString(),
@@ -78,6 +89,7 @@ public class NoteEditFragment extends Fragment {
     }
 
     private void onClickDeleteButton(View view) {
+        Log.d(LOG_TAG, "NoteEditFragment  onClickDeleteButton");
         Bundle result = new Bundle();
         if (noteEntityTemp != null) {
             NoteEntity noteEntity = new NoteEntity(id,
@@ -99,6 +111,7 @@ public class NoteEditFragment extends Fragment {
     }
 
     private void initNoteEdit() {
+        Log.d(LOG_TAG, "NoteEditFragment  initNoteEdit");
         titleEditText = getView().findViewById(R.id.title_edit_text);
         descriptionEditText = getView().findViewById(R.id.description_edit_text);
         saveButton = getView().findViewById(R.id.save_button);

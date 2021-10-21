@@ -119,6 +119,7 @@ public class NotesListFragment extends Fragment {
         } else {
             container = R.id.fragment_container_note_edit;
         }
+        Log.d(LOG_TAG, "NotesListFragment  openNoteScreen." + container);
         Bundle result = new Bundle();
         result.putParcelable(NoteEditFragment.IN_NOTE_ENTITY_KEY, item);
         fragmentManager.setFragmentResult(NoteEditFragment.IN_DATA_KEY, result);
@@ -134,6 +135,7 @@ public class NotesListFragment extends Fragment {
     }
 
     private void dataFromNoteEditFragment() {
+        Log.d(LOG_TAG, "NotesListFragment  dataFromNoteEditFragment.");
         fragmentManager.setFragmentResultListener(NoteEditFragment.BACK_DATA_KEY, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
@@ -160,6 +162,7 @@ public class NotesListFragment extends Fragment {
 
     private void deleteNoteEntity(NoteEntity noteEntity) {
         notesRepo.deleteNote(noteEntity.getId());
+        SaveFile.writeToFile(SaveFile.updateFile(), getActivity().getApplicationContext(), false);
     }
 
 
