@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,12 +29,14 @@ import com.geekbrains.note.domain.NotesRepo;
 import com.geekbrains.note.impl.NotesRepoImpl;
 import com.geekbrains.note.io.IoAdapter;
 import com.geekbrains.note.io.SaveFile;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class NotesListFragment extends Fragment {
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private FragmentManager fragmentManager;
+
     public static final NotesRepo notesRepo = new NotesRepoImpl();
     private final NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
 
@@ -48,7 +51,12 @@ public class NotesListFragment extends Fragment {
                 + "      notesRepo.getNotes().isEmpty() = " + notesRepo.getNotes().isEmpty());
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+
+
     }
+
+
 
     @Nullable
     @Override
@@ -63,6 +71,7 @@ public class NotesListFragment extends Fragment {
         fragmentManager = requireActivity().getSupportFragmentManager();
         initToolbar();
         initRecycler();
+
         super.onResume();
     }
 
@@ -101,7 +110,6 @@ public class NotesListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.new_note_menu) {
-
             openNoteScreen(null);
             return true;
         }

@@ -36,12 +36,13 @@ public class NoteEditFragment extends Fragment {
     private int id;
     private NoteEntity noteEntityTemp;
     private FragmentManager fragmentManager;
+    private static boolean firstStart = true;
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "NoteEditFragment  onCreateView.   container = " + container);
+        Log.d(LOG_TAG, "NoteEditFragment  onCreateView.   inflater = " + inflater + "   savedInstanceState = " + savedInstanceState);
         return inflater.inflate(R.layout.fragment_note_edit, container, false);
     }
 

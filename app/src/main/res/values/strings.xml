@@ -5,4 +5,15 @@
     <string name="description_edit_text">Description</string>
     <string name="save_button_text">Save</string>
     <string name="delete_button_text">Delete</string>
+    <string name="menu_item_button_main">Main</string>
+    <string name="menu_item_button_save_file">Save file</string>
+    <string name="menu_item_button_diagram">Diagram</string>
+    <string name="menu_item_button_settings">Settings</string>
+    <string name="save_to_file_button_text">Save to file</string>
+    <string name="hint_name_save_file">Enter file\'s name</string>
+
+    <string name="switch_button_dark_theme">Dark theme</string>
+    <string name="switch_button_add_date">Add date to note</string>
+    <string name="text_view_main_font">Main font size</string>
+    <string name="text_view_optional_font">Optional font size</string>
 </resources>

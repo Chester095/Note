@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".ui.NotesListFragment">
+
+    <EditText
+        android:id="@+id/name_save_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_note_edit"
+        android:hint="@string/hint_name_save_file"
+        android:textSize="@dimen/description_vh_text_size"
+        android:autofillHints="" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/save_to_file_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_note_edit"
+        android:background="@color/teal_700"
+        android:text="@string/save_to_file_button_text"
+        android:textSize="@dimen/description_vh_text_size" />
+
+
+</LinearLayout>
