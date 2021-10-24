@@ -2,6 +2,8 @@ package com.geekbrains.note.ui;
 
 import static com.geekbrains.note.ui.StartActivity.LOG_TAG;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -29,12 +32,11 @@ import com.geekbrains.note.domain.NotesRepo;
 import com.geekbrains.note.impl.NotesRepoImpl;
 import com.geekbrains.note.io.IoAdapter;
 import com.geekbrains.note.io.SaveFile;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.Objects;
 
 public class NotesListFragment extends Fragment {
 
-    private Toolbar toolbar;
-    private RecyclerView recyclerView;
     private FragmentManager fragmentManager;
 
     public static final NotesRepo notesRepo = new NotesRepoImpl();
@@ -45,17 +47,13 @@ public class NotesListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         if (notesRepo.getNotes().isEmpty()) {
-            new IoAdapter().readFromFile(SaveFile.readFromFile(getActivity().getApplicationContext()));
+            new IoAdapter().readFromFile(SaveFile.readFromFile(requireActivity().getApplicationContext()));
         }
         Log.d(LOG_TAG, "onCreate.   savedInstanceState = " + savedInstanceState
                 + "      notesRepo.getNotes().isEmpty() = " + notesRepo.getNotes().isEmpty());
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-
-
     }
-
 
 
     @Nullable
@@ -138,6 +136,34 @@ public class NotesListFragment extends Fragment {
                 .commit();
     }
 
+
+    /*** Запуск openPopupMenu
+     *
+     * @param item
+     */
+    @SuppressLint("NonConstantResourceId")
+    private void openPopupMenu(@Nullable NoteEntity item) {
+        PopupMenu popupMenu = new PopupMenu(requireActivity().getApplicationContext(), null);
+        popupMenu.inflate(R.menu.note_popup_menu);
+        popupMenu.setOnMenuItemClickListener(item1 -> {
+            switch (item1.getItemId()) {
+                case R.id.popup_menu_item_delete:
+                    Toast.makeText(NotesListFragment.this.requireActivity().getApplicationContext(), "Bookmark", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.popup_menu_item_duplicate:
+                    Toast.makeText(NotesListFragment.this.requireActivity().getApplicationContext(), "Upload", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.popup_menu_item_edit:
+                    Toast.makeText(NotesListFragment.this.requireActivity().getApplicationContext(), "Share Facebook", Toast.LENGTH_SHORT).show();
+                    NotesListFragment.this.openNoteScreen(item);
+                    break;
+            }
+
+            return true;
+        });
+        popupMenu.show();
+    }
+
     private boolean checkOrientation() {
         return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
@@ -164,13 +190,13 @@ public class NotesListFragment extends Fragment {
             SaveFile.writeToFile(new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(), noteEntity.getDescription()), getActivity().getApplicationContext(), true);
         } else {
             notesRepo.updateNote(noteEntity.getId(), noteEntity);
-            SaveFile.writeToFile(SaveFile.updateFile(), getActivity().getApplicationContext(), false);
+            SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
         }
     }
 
     private void deleteNoteEntity(NoteEntity noteEntity) {
         notesRepo.deleteNote(noteEntity.getId());
-        SaveFile.writeToFile(SaveFile.updateFile(), getActivity().getApplicationContext(), false);
+        SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
     }
 
 
@@ -178,19 +204,26 @@ public class NotesListFragment extends Fragment {
      * recyclerView состоит из сам recyclerView, адаптер и вьюшки
      */
     private void initRecycler() {
-        recyclerView = getView().findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext())); // способ расположение заметок в recyclerView друг относительно друга (вертикальный список)
         recyclerView.setAdapter(adapter); // определяем адаптер
-        adapter.setOnItemClickListener(this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
+        adapter.setOnItemClickListener((NoteEntity item) -> {
+            onItemClick(item);
+        }); // слушатель на нажатие говорит какой метод дальше использовать
         adapter.setData(notesRepo.getNotes()); // передаём данные из репозитория в адаптер
         Log.d(LOG_TAG, "initRecycler.   notesRepo = " + notesRepo);
+    }
+
+
+    private void initContextMenu() {
+
     }
 
     /*** Инициализация Toolbar
      *
      */
     private void initToolbar() {
-        toolbar = getView().findViewById(R.id.toolbar);
+        Toolbar toolbar = getView().findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
     }
@@ -200,7 +233,8 @@ public class NotesListFragment extends Fragment {
      * @param item - конкретная заметка, на которую нажали
      */
     private void onItemClick(NoteEntity item) {
-        openNoteScreen(item);
+        openPopupMenu(item);
+//        openNoteScreen(item);
     }
 
 

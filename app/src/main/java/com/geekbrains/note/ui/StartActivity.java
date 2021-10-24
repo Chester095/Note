@@ -14,10 +14,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class StartActivity extends AppCompatActivity {
     public static final String LOG_TAG = "@@@";
-    private BottomNavigationView bottomNavigationView;
 
     private final Map<Integer, Fragment> fragmentsMap = createFragments();
 
@@ -37,13 +37,13 @@ public class StartActivity extends AppCompatActivity {
 
 
     private void initBottomNavigation() {
-        bottomNavigationView = findViewById(R.id.bottom_nav_view);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_view);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Toast.makeText(getApplicationContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
 
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container_main, fragmentsMap.get(item.getItemId()))
+                    .replace(R.id.fragment_container_main, Objects.requireNonNull(fragmentsMap.get(item.getItemId())))
                     .commit();
 
             return true;
@@ -62,7 +62,7 @@ public class StartActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "StartActivity.   initLandscapeOrientation");
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container_main, fragmentsMap.get(R.id.menu_item_main))
+                .replace(R.id.fragment_container_main, Objects.requireNonNull(fragmentsMap.get(R.id.menu_item_main)))
                 .replace(R.id.fragment_container_note_edit, new NoteEditFragment())
                 .commit();
     }
@@ -72,7 +72,7 @@ public class StartActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "StartActivity.   initPortraitOrientation");
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container_main,  fragmentsMap.get(R.id.menu_item_main))
+                .replace(R.id.fragment_container_main, Objects.requireNonNull(fragmentsMap.get(R.id.menu_item_main)))
                 .commit();
     }
 

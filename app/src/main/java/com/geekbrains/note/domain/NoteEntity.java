@@ -2,6 +2,7 @@ package com.geekbrains.note.domain;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 

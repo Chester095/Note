@@ -16,4 +16,7 @@
     <string name="switch_button_add_date">"Добавлять текущую "</string>
     <string name="text_view_main_font">Размер основного шрифта</string>
     <string name="text_view_optional_font">Размер дополнительного шрифта</string>
+    <string name="popup_menu_item_delete">Удалить</string>
+    <string name="popup_menu_item_duplicate">Дублировать</string>
+    <string name="popup_menu_item_edit">Изменить</string>
 </resources>
