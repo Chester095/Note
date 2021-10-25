@@ -10,7 +10,7 @@
         android:icon="@drawable/ic_duplicate"
         android:title="@string/popup_menu_item_duplicate" />
     <item
-        android:id="@+id/popup_menu_item_edit"
+        android:id="@+id/popup_menu_item_fil_repo"
         android:icon="@drawable/ic_edit"
         android:title="@string/popup_menu_item_edit" />
 </menu>

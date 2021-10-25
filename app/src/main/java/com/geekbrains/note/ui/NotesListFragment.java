@@ -2,8 +2,6 @@ package com.geekbrains.note.ui;
 
 import static com.geekbrains.note.ui.StartActivity.LOG_TAG;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -33,9 +30,7 @@ import com.geekbrains.note.impl.NotesRepoImpl;
 import com.geekbrains.note.io.IoAdapter;
 import com.geekbrains.note.io.SaveFile;
 
-import java.util.Objects;
-
-public class NotesListFragment extends Fragment {
+public class NotesListFragment extends Fragment{
 
     private FragmentManager fragmentManager;
 
@@ -136,34 +131,6 @@ public class NotesListFragment extends Fragment {
                 .commit();
     }
 
-
-    /*** Запуск openPopupMenu
-     *
-     * @param item
-     */
-    @SuppressLint("NonConstantResourceId")
-    private void openPopupMenu(@Nullable NoteEntity item) {
-        PopupMenu popupMenu = new PopupMenu(requireActivity().getApplicationContext(), null);
-        popupMenu.inflate(R.menu.note_popup_menu);
-        popupMenu.setOnMenuItemClickListener(item1 -> {
-            switch (item1.getItemId()) {
-                case R.id.popup_menu_item_delete:
-                    Toast.makeText(NotesListFragment.this.requireActivity().getApplicationContext(), "Bookmark", Toast.LENGTH_SHORT).show();
-                    break;
-                case R.id.popup_menu_item_duplicate:
-                    Toast.makeText(NotesListFragment.this.requireActivity().getApplicationContext(), "Upload", Toast.LENGTH_SHORT).show();
-                    break;
-                case R.id.popup_menu_item_edit:
-                    Toast.makeText(NotesListFragment.this.requireActivity().getApplicationContext(), "Share Facebook", Toast.LENGTH_SHORT).show();
-                    NotesListFragment.this.openNoteScreen(item);
-                    break;
-            }
-
-            return true;
-        });
-        popupMenu.show();
-    }
-
     private boolean checkOrientation() {
         return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
@@ -207,16 +174,27 @@ public class NotesListFragment extends Fragment {
         RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext())); // способ расположение заметок в recyclerView друг относительно друга (вертикальный список)
         recyclerView.setAdapter(adapter); // определяем адаптер
-        adapter.setOnItemClickListener((NoteEntity item) -> {
-            onItemClick(item);
-        }); // слушатель на нажатие говорит какой метод дальше использовать
+        adapter.setOnItemClickListener(NotesListFragment.this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
+        adapter.setOnItemClickListenerPopUpMenu(this::onPopupButtonClick);
         adapter.setData(notesRepo.getNotes()); // передаём данные из репозитория в адаптер
         Log.d(LOG_TAG, "initRecycler.   notesRepo = " + notesRepo);
     }
 
 
-    private void initContextMenu() {
-
+    public void onPopupButtonClick(MenuItem menuItem, NoteEntity noteEntity) {
+        switch (menuItem.getItemId()) {
+            case R.id.popup_menu_item_delete:
+                deleteNoteEntity(noteEntity);
+                initRecycler();
+                break;
+            case R.id.popup_menu_item_duplicate:
+                Toast.makeText(getContext(), "Дублирование заметки", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.popup_menu_item_fil_repo:
+                fillRepoByTestValues();
+                Toast.makeText(getContext(), "Данные записаны в файл. Перезапустите програму", Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
 
     /*** Инициализация Toolbar
@@ -233,8 +211,7 @@ public class NotesListFragment extends Fragment {
      * @param item - конкретная заметка, на которую нажали
      */
     private void onItemClick(NoteEntity item) {
-        openPopupMenu(item);
-//        openNoteScreen(item);
+        openNoteScreen(item);
     }
 
 
@@ -242,31 +219,20 @@ public class NotesListFragment extends Fragment {
      * создаём и тут же записываем в репозиторий
      */
     private void fillRepoByTestValues() {
+        SaveFile.writeToFile(new IoAdapter().saveToFile(0, "Заметка 1", "Октябрь уж наступил — уж роща отряхает"), requireActivity().getApplicationContext(), false);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(1, "Заметка 2", "Последние листы с нагих своих ветвей;"), requireActivity().getApplicationContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(2, "Заметка 3", "Дохнул осенний хлад — дорога промерзает."), requireActivity().getApplicationContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(3, "Заметка 4", "Журча еще бежит за мельницу ручей,"), requireActivity().getApplicationContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(4, "Заметка 5", "Но пруд уже застыл; сосед мой поспешает"), requireActivity().getApplicationContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(5, "Заметка 6", "В отъезжие поля с охотою своей,"), requireActivity().getApplicationContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(6, "Заметка 7", "И страждут озими от бешеной забавы,"), requireActivity().getApplicationContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(7, "Заметка 8", "И будит лай собак уснувшие дубравы."), requireActivity().getApplicationContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(8, "Заметка 9", "Теперь моя пора: я не люблю весны;"), requireActivity().getApplicationContext(), true);
+        SaveFile.writeToFile(new IoAdapter().saveToFile(9, "Заметка 10", "Скучна мне оттепель; вонь, грязь — весной я болен;"), requireActivity().getApplicationContext(), true);
 
-
-        notesRepo.createNote(new NoteEntity("Заметка 1", "Октябрь уж наступил — уж роща отряхает"));
-        notesRepo.createNote(new NoteEntity("Заметка 2", "Последние листы с нагих своих ветвей;"));
-        notesRepo.createNote(new NoteEntity("Заметка 3", "Дохнул осенний хлад — дорога промерзает."));
-        notesRepo.createNote(new NoteEntity("Заметка 4", "Журча еще бежит за мельницу ручей,"));
-        notesRepo.createNote(new NoteEntity("Заметка 5", "Но пруд уже застыл; сосед мой поспешает"));
-        notesRepo.createNote(new NoteEntity("Заметка 6", "В отъезжие поля с охотою своей,"));
-        notesRepo.createNote(new NoteEntity("Заметка 7", "И страждут озими от бешеной забавы,"));
-        notesRepo.createNote(new NoteEntity("Заметка 8", "И будит лай собак уснувшие дубравы."));
-        notesRepo.createNote(new NoteEntity("Заметка 9", "Теперь моя пора: я не люблю весны;"));
-        notesRepo.createNote(new NoteEntity("Заметка 10", "Скучна мне оттепель; вонь, грязь — весной я болен;"));
-    /*
-        SaveFile.writeToFile(new IoAdapter().saveToFile(0, "Заметка 1", "Октябрь уж наступил — уж роща отряхает"), getBaseContext(), false);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(1, "Заметка 2", "Последние листы с нагих своих ветвей;"), getBaseContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(2, "Заметка 3", "Дохнул осенний хлад — дорога промерзает."), getBaseContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(3, "Заметка 4", "Журча еще бежит за мельницу ручей,"), getBaseContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(4, "Заметка 5", "Но пруд уже застыл; сосед мой поспешает"), getBaseContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(5, "Заметка 6", "В отъезжие поля с охотою своей,"), getBaseContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(6, "Заметка 7", "И страждут озими от бешеной забавы,"), getBaseContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(7, "Заметка 8", "И будит лай собак уснувшие дубравы."), getBaseContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(8, "Заметка 9", "Теперь моя пора: я не люблю весны;"), getBaseContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(9, "Заметка 10", "Скучна мне оттепель; вонь, грязь — весной я болен;"), getBaseContext(), true);*/
-
-//        SaveFile.readFromFile(getBaseContext());
+        SaveFile.readFromFile(requireActivity().getApplicationContext());
 
     }
+
+
 }

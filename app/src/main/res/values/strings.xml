@@ -18,5 +18,5 @@
     <string name="text_view_optional_font">Optional font size</string>
     <string name="popup_menu_item_delete">Delete</string>
     <string name="popup_menu_item_duplicate">Duplicate</string>
-    <string name="popup_menu_item_edit">Edit</string>
+    <string name="popup_menu_item_edit">Fill repo test value</string>
 </resources>

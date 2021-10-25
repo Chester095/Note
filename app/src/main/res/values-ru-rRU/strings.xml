@@ -18,5 +18,5 @@
     <string name="text_view_optional_font">Размер дополнительного шрифта</string>
     <string name="popup_menu_item_delete">Удалить</string>
     <string name="popup_menu_item_duplicate">Дублировать</string>
-    <string name="popup_menu_item_edit">Изменить</string>
+    <string name="popup_menu_item_edit">Заполнить файл тестовыми данными</string>
 </resources>
