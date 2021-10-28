@@ -1,18 +1,18 @@
 package com.geekbrains.note.io;
 
-import static com.geekbrains.note.ui.NotesListFragment.notesRepo;
-
 import com.geekbrains.note.domain.NoteEntity;
+import com.geekbrains.note.ui.NotesListFragment;
 
 
-public class IoAdapter {
+public class IoAdapter extends NotesListFragment{
+
 
 
     public String saveToFile(int id, String title, String description) {
         return id + "\t|\t" + title + "\t|\t" + description + "\t|\r\n";
     }
 
-    public static void readFromFile(String res) {
+    public void readFromFile(String res) {
         int firstPosition = 0;
         int id;
         String title;
@@ -24,7 +24,7 @@ public class IoAdapter {
             firstPosition = res.indexOf("\t|\t", firstPosition) + 3;
             description = res.substring(firstPosition, res.indexOf("\t|\r\n", firstPosition));
             firstPosition = res.indexOf("\t|\r\n", firstPosition) + 4;
-            notesRepo.createNote(new NoteEntity(id, title, description));
+            notesRepo.getNotesRepo().getNotes().add(new NoteEntity(id, title, description));
         }
     }
 }

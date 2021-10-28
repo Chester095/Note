@@ -2,7 +2,6 @@ package com.geekbrains.note.ui;
 
 import static com.geekbrains.note.ui.StartActivity.LOG_TAG;
 
-import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -26,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.geekbrains.note.R;
+import com.geekbrains.note.domain.App;
 import com.geekbrains.note.domain.NoteEntity;
 import com.geekbrains.note.domain.NotesRepo;
 import com.geekbrains.note.impl.NotesRepoImpl;
@@ -36,22 +35,27 @@ public class NotesListFragment extends Fragment {
 
     private FragmentManager fragmentManager;
 
-    public static final NotesRepo notesRepo = new NotesRepoImpl();
+    public final App notesRepo = (App) getActivity().getApplication();
     private final NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+
         setHasOptionsMenu(true);
-        if (notesRepo.getNotes().isEmpty()) {
+        if (notesRepo.getNotesRepo().getNotes().isEmpty()) {
             new IoAdapter().readFromFile(SaveFile.readFromFile(requireActivity().getApplicationContext()));
         }
         Log.d(LOG_TAG, "onCreate.   savedInstanceState = " + savedInstanceState
-                + "      notesRepo.getNotes().isEmpty() = " + notesRepo.getNotes().isEmpty());
+                + "      notesRepo.getNotes().isEmpty() = " + getApp().getNotesRepo().getNotes().isEmpty());
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
     }
 
+
+    public App getApp() {
+        return (App) requireActivity().getApplication();
+    }
 
     @Nullable
     @Override
@@ -147,7 +151,7 @@ public class NotesListFragment extends Fragment {
                 if (operationType == 1)
                     saveNoteEntity(noteEntity);
                 else if (operationType == 2)
-                    deleteAlertInfo(noteEntity);
+                    deleteNoteEntity(noteEntity);
             }
         });
     }
@@ -155,12 +159,17 @@ public class NotesListFragment extends Fragment {
 
     private void saveNoteEntity(NoteEntity noteEntity) {
         if (noteEntity.getId() == 0) {
-            notesRepo.createNote(noteEntity);
+            getApp().getNotesRepo().createNote(noteEntity);
             SaveFile.writeToFile(new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(), noteEntity.getDescription()), getActivity().getApplicationContext(), true);
         } else {
-            notesRepo.updateNote(noteEntity.getId(), noteEntity);
+            getApp().getNotesRepo().updateNote(noteEntity.getId(), noteEntity);
             SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
         }
+    }
+
+    private void deleteNoteEntity(NoteEntity noteEntity) {
+        getApp().getNotesRepo().deleteNote(noteEntity.getId());
+        SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
     }
 
 
@@ -173,34 +182,16 @@ public class NotesListFragment extends Fragment {
         recyclerView.setAdapter(adapter); // определяем адаптер
         adapter.setOnItemClickListener(NotesListFragment.this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
         adapter.setOnItemClickListenerPopUpMenu(this::onPopupButtonClick);
-        adapter.setData(notesRepo.getNotes()); // передаём данные из репозитория в адаптер
-        Log.d(LOG_TAG, "initRecycler.   notesRepo = " + notesRepo);
-    }
-
-    private void deleteNoteEntity(NoteEntity noteEntity) {
-        notesRepo.deleteNote(noteEntity.getId());
-        SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
-        initRecycler();
+        adapter.setData(getApp().getNotesRepo().getNotes()); // передаём данные из репозитория в адаптер
+        Log.d(LOG_TAG, "initRecycler.   notesRepo = " + getApp().getNotesRepo());
     }
 
 
-    private void deleteAlertInfo(NoteEntity noteEntity) {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Точно хотите удалить?")
-                .setIcon(R.drawable.ic_attention)
-                .setPositiveButton("Да", (dialog, which) -> {
-                    deleteNoteEntity(noteEntity);
-                })
-                .setNegativeButton("Нет", ((dialog, which) -> Toast.makeText(getContext(), "Хорошо не будем )", Toast.LENGTH_SHORT).show()))
-                .setCancelable(true)
-                .show();
-    }
-
-    @SuppressLint("NonConstantResourceId")
     public void onPopupButtonClick(MenuItem menuItem, NoteEntity noteEntity) {
         switch (menuItem.getItemId()) {
             case R.id.popup_menu_item_delete:
-                deleteAlertInfo(noteEntity);
+                deleteNoteEntity(noteEntity);
+                initRecycler();
                 break;
             case R.id.popup_menu_item_duplicate:
                 Toast.makeText(getContext(), "Дублирование заметки", Toast.LENGTH_SHORT).show();
