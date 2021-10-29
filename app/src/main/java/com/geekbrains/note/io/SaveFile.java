@@ -49,9 +49,9 @@ public class SaveFile extends NotesListFragment {
         }
     }
 
-    public static String updateFile() {
+    public String updateFile() {
         String temp = "";
-        List<NoteEntity> data = notesRepo.getNotesRepo().getNotes();
+        List<NoteEntity> data = notesRepo.getNotes();
         for (NoteEntity noteEntity : data) {
             temp += new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(), noteEntity.getDescription());
         }

@@ -24,7 +24,7 @@ public class IoAdapter extends NotesListFragment{
             firstPosition = res.indexOf("\t|\t", firstPosition) + 3;
             description = res.substring(firstPosition, res.indexOf("\t|\r\n", firstPosition));
             firstPosition = res.indexOf("\t|\r\n", firstPosition) + 4;
-            notesRepo.getNotesRepo().getNotes().add(new NoteEntity(id, title, description));
+            notesRepo.getNotes().add(new NoteEntity(id, title, description));
         }
     }
 }

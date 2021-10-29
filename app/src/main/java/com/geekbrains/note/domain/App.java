@@ -5,9 +5,9 @@ import android.app.Application;
 import com.geekbrains.note.impl.NotesRepoImpl;
 
 public class App extends Application {
-    private NotesRepo notesRepo = new NotesRepoImpl();
+    private NotesRepoImpl notesRepo = new NotesRepoImpl();
 
-    public NotesRepo getNotesRepo(){
+    public NotesRepoImpl getNotesRepo(){
         return notesRepo;
     }
 }

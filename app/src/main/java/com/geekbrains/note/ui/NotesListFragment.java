@@ -34,8 +34,8 @@ import com.geekbrains.note.io.SaveFile;
 public class NotesListFragment extends Fragment {
 
     private FragmentManager fragmentManager;
+    public final NotesRepoImpl notesRepo = ((App) getApp()).getNotesRepo();
 
-    public final App notesRepo = (App) getActivity().getApplication();
     private final NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
 
 
@@ -43,7 +43,7 @@ public class NotesListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
 
         setHasOptionsMenu(true);
-        if (notesRepo.getNotesRepo().getNotes().isEmpty()) {
+        if (notesRepo.getNotes().isEmpty()) {
             new IoAdapter().readFromFile(SaveFile.readFromFile(requireActivity().getApplicationContext()));
         }
         Log.d(LOG_TAG, "onCreate.   savedInstanceState = " + savedInstanceState
