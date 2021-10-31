@@ -24,9 +24,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.geekbrains.note.R;
-import com.geekbrains.note.domain.App;
 import com.geekbrains.note.domain.NoteEntity;
-import com.geekbrains.note.domain.NotesRepo;
+import com.geekbrains.note.domain.NotesApp;
 import com.geekbrains.note.impl.NotesRepoImpl;
 import com.geekbrains.note.io.IoAdapter;
 import com.geekbrains.note.io.SaveFile;
@@ -34,7 +33,7 @@ import com.geekbrains.note.io.SaveFile;
 public class NotesListFragment extends Fragment {
 
     private FragmentManager fragmentManager;
-    public final NotesRepoImpl notesRepo = ((App) getApp()).getNotesRepo();
+    public static NotesRepoImpl notesRepo;
 
     private final NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
 
@@ -43,18 +42,21 @@ public class NotesListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
 
         setHasOptionsMenu(true);
-        if (notesRepo.getNotes().isEmpty()) {
+        initNoteRepoFromMyApp();
+        if (getApp().getAppNotesRepo().getNotes().isEmpty()) {
             new IoAdapter().readFromFile(SaveFile.readFromFile(requireActivity().getApplicationContext()));
         }
-        Log.d(LOG_TAG, "onCreate.   savedInstanceState = " + savedInstanceState
-                + "      notesRepo.getNotes().isEmpty() = " + getApp().getNotesRepo().getNotes().isEmpty());
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
     }
 
 
-    public App getApp() {
-        return (App) requireActivity().getApplication();
+    private void initNoteRepoFromMyApp() {
+        notesRepo = getApp().getAppNotesRepo();
+    }
+
+    public NotesApp getApp() {
+        return (NotesApp) requireActivity().getApplication();
     }
 
     @Nullable
@@ -159,16 +161,16 @@ public class NotesListFragment extends Fragment {
 
     private void saveNoteEntity(NoteEntity noteEntity) {
         if (noteEntity.getId() == 0) {
-            getApp().getNotesRepo().createNote(noteEntity);
+            getApp().getAppNotesRepo().createNote(noteEntity);
             SaveFile.writeToFile(new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(), noteEntity.getDescription()), getActivity().getApplicationContext(), true);
         } else {
-            getApp().getNotesRepo().updateNote(noteEntity.getId(), noteEntity);
+            getApp().getAppNotesRepo().updateNote(noteEntity.getId(), noteEntity);
             SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
         }
     }
 
     private void deleteNoteEntity(NoteEntity noteEntity) {
-        getApp().getNotesRepo().deleteNote(noteEntity.getId());
+        getApp().getAppNotesRepo().deleteNote(noteEntity.getId());
         SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
     }
 
@@ -182,8 +184,8 @@ public class NotesListFragment extends Fragment {
         recyclerView.setAdapter(adapter); // определяем адаптер
         adapter.setOnItemClickListener(NotesListFragment.this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
         adapter.setOnItemClickListenerPopUpMenu(this::onPopupButtonClick);
-        adapter.setData(getApp().getNotesRepo().getNotes()); // передаём данные из репозитория в адаптер
-        Log.d(LOG_TAG, "initRecycler.   notesRepo = " + getApp().getNotesRepo());
+        adapter.setData(getApp().getAppNotesRepo().getNotes()); // передаём данные из репозитория в адаптер
+        Log.d(LOG_TAG, "initRecycler.   notesRepo = " + getApp().getAppNotesRepo());
     }
 
 

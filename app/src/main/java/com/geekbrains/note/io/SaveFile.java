@@ -3,7 +3,6 @@ package com.geekbrains.note.io;
 import android.content.Context;
 import android.util.Log;
 
-import com.geekbrains.note.domain.App;
 import com.geekbrains.note.domain.NoteEntity;
 import com.geekbrains.note.ui.NotesListFragment;
 
@@ -17,7 +16,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class SaveFile extends NotesListFragment {
+public class SaveFile{
 
     static final String LOG_TAG = "@@@";
     static final String FILENAME = "file.txt";
@@ -49,9 +48,9 @@ public class SaveFile extends NotesListFragment {
         }
     }
 
-    public String updateFile() {
+    public static String updateFile() {
         String temp = "";
-        List<NoteEntity> data = notesRepo.getNotes();
+        List<NoteEntity> data = NotesListFragment.notesRepo.getNotes();
         for (NoteEntity noteEntity : data) {
             temp += new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(), noteEntity.getDescription());
         }

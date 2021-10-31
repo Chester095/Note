@@ -10,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.geekbrains.note.R;
-import com.geekbrains.note.domain.App;
-import com.geekbrains.note.impl.NotesRepoImpl;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.HashMap;

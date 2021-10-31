@@ -4,9 +4,7 @@ import com.geekbrains.note.domain.NoteEntity;
 import com.geekbrains.note.ui.NotesListFragment;
 
 
-public class IoAdapter extends NotesListFragment{
-
-
+public class IoAdapter{
 
     public String saveToFile(int id, String title, String description) {
         return id + "\t|\t" + title + "\t|\t" + description + "\t|\r\n";
@@ -24,7 +22,7 @@ public class IoAdapter extends NotesListFragment{
             firstPosition = res.indexOf("\t|\t", firstPosition) + 3;
             description = res.substring(firstPosition, res.indexOf("\t|\r\n", firstPosition));
             firstPosition = res.indexOf("\t|\r\n", firstPosition) + 4;
-            notesRepo.getNotes().add(new NoteEntity(id, title, description));
+            NotesListFragment.notesRepo.getNotes().add(new NoteEntity(id,title,description));
         }
     }
 }
