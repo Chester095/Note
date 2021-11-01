@@ -2,6 +2,7 @@ package com.geekbrains.note.ui;
 
 import static com.geekbrains.note.ui.StartActivity.LOG_TAG;
 
+import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -30,7 +32,7 @@ import com.geekbrains.note.impl.NotesRepoImpl;
 import com.geekbrains.note.io.IoAdapter;
 import com.geekbrains.note.io.SaveFile;
 
-public class NotesListFragment extends Fragment{
+public class NotesListFragment extends Fragment {
 
     private FragmentManager fragmentManager;
 
@@ -145,7 +147,7 @@ public class NotesListFragment extends Fragment{
                 if (operationType == 1)
                     saveNoteEntity(noteEntity);
                 else if (operationType == 2)
-                    deleteNoteEntity(noteEntity);
+                    deleteAlertInfo(noteEntity);
             }
         });
     }
@@ -159,11 +161,6 @@ public class NotesListFragment extends Fragment{
             notesRepo.updateNote(noteEntity.getId(), noteEntity);
             SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
         }
-    }
-
-    private void deleteNoteEntity(NoteEntity noteEntity) {
-        notesRepo.deleteNote(noteEntity.getId());
-        SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
     }
 
 
@@ -180,12 +177,30 @@ public class NotesListFragment extends Fragment{
         Log.d(LOG_TAG, "initRecycler.   notesRepo = " + notesRepo);
     }
 
+    private void deleteNoteEntity(NoteEntity noteEntity) {
+        notesRepo.deleteNote(noteEntity.getId());
+        SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
+        initRecycler();
+    }
 
+
+    private void deleteAlertInfo(NoteEntity noteEntity) {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Точно хотите удалить?")
+                .setIcon(R.drawable.ic_attention)
+                .setPositiveButton("Да", (dialog, which) -> {
+                    deleteNoteEntity(noteEntity);
+                })
+                .setNegativeButton("Нет", ((dialog, which) -> Toast.makeText(getContext(), "Хорошо не будем )", Toast.LENGTH_SHORT).show()))
+                .setCancelable(true)
+                .show();
+    }
+
+    @SuppressLint("NonConstantResourceId")
     public void onPopupButtonClick(MenuItem menuItem, NoteEntity noteEntity) {
         switch (menuItem.getItemId()) {
             case R.id.popup_menu_item_delete:
-                deleteNoteEntity(noteEntity);
-                initRecycler();
+                deleteAlertInfo(noteEntity);
                 break;
             case R.id.popup_menu_item_duplicate:
                 Toast.makeText(getContext(), "Дублирование заметки", Toast.LENGTH_SHORT).show();
