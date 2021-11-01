@@ -17,7 +17,7 @@ public class NotesRepoImpl implements NotesRepo {
     private int counter = 0; // счётчик для списка cache
 
 
-    /*** возращает данные
+    /*** возвращает данные
      *
      * @return
      */
@@ -64,9 +64,7 @@ public class NotesRepoImpl implements NotesRepo {
      */
     @Override
     public boolean updateNote(int id, NoteEntity note) {
-        deleteNote(id);
-        note.setId(id); // на какой-то "всякий случай"
-        cache.add(note);
+        cache.set(id-1, note);
         return true;
     }
 }

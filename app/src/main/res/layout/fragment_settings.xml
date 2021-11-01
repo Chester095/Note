@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/margin_note_edit"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".ui.NotesListFragment">
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switch_button_dark_theme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_note_edit"
+        android:text="@string/switch_button_dark_theme"
+        android:textSize="@dimen/description_vh_text_size" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switch_button_add_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_note_edit"
+        android:text="@string/switch_button_add_date"
+        android:textSize="@dimen/description_vh_text_size" />
+
+    <LinearLayout
+        android:layout_margin="@dimen/margin_note_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_view_main_font"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="wrap_content"
+            android:text="@string/text_view_main_font"
+            android:textSize="@dimen/description_vh_text_size" />
+
+        <EditText
+            android:id="@+id/edit_text_view_main_font"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="numberSigned"
+            android:textSize="@dimen/description_vh_text_size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_margin="@dimen/margin_note_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_view_optional_font"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="wrap_content"
+            android:text="@string/text_view_optional_font"
+            android:textSize="@dimen/description_vh_text_size" />
+
+        <EditText
+            android:id="@+id/edit_text_view_optional_font"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="numberSigned"
+            android:textSize="@dimen/description_vh_text_size" />
+    </LinearLayout>
+
+</LinearLayout>

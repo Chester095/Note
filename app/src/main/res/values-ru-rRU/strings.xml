@@ -6,4 +6,17 @@
     <string name="description_edit_text">Текст заметки</string>
     <string name="save_button_text">Сохранить</string>
     <string name="delete_button_text">Удалить</string>
+    <string name="menu_item_button_main">Главная</string>
+    <string name="menu_item_button_save_file">Сохранить файл</string>
+    <string name="menu_item_button_diagram">Диаграммы</string>
+    <string name="menu_item_button_settings">Настройки</string>
+    <string name="hint_name_save_file">Введите название файла</string>
+    <string name="save_to_file_button_text">Сохранить в файл</string>
+    <string name="switch_button_dark_theme">Включить тёмную тему</string>
+    <string name="switch_button_add_date">"Добавлять текущую "</string>
+    <string name="text_view_main_font">Размер основного шрифта</string>
+    <string name="text_view_optional_font">Размер дополнительного шрифта</string>
+    <string name="popup_menu_item_delete">Удалить</string>
+    <string name="popup_menu_item_duplicate">Дублировать</string>
+    <string name="popup_menu_item_edit">Заполнить файл тестовыми данными</string>
 </resources>

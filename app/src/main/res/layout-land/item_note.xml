@@ -43,16 +43,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:maxLines="2"
+                    android:maxLines="1"
                     android:textSize="@dimen/description_vh_text_size"
                     android:textStyle="italic" />
             </LinearLayout>
 
-
             <Button
                 android:id="@+id/item_note_popupmenu_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:background="@drawable/ic_popupmenu" />
         </LinearLayout>

@@ -4,7 +4,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.geekbrains.note.domain.NoteEntity;
+import com.geekbrains.note.listeners.OnItemPopUpMenuClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,12 @@ import java.util.List;
  */
 public class NotesAdapter extends RecyclerView.Adapter<NoteVh> {
     private List<NoteEntity> data = new ArrayList<>();
-    private OnItemClickListener clickListener = null;
+    private OnItemPopUpMenuClickListener onItemPopUpMenuClickListener;
+    private OnItemClickListener clickListener;
+
+    public void setOnItemClickListenerPopUpMenu(OnItemPopUpMenuClickListener onItemPopUpMenuClickListener) {
+        this.onItemPopUpMenuClickListener = onItemPopUpMenuClickListener;
+    }
 
     /*** Получаем сюда данные для работы с ними
      * из активити. То что будем отрисовывать.
@@ -38,7 +45,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteVh> {
     @NonNull
     @Override
     public NoteVh onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new NoteVh(parent, clickListener);
+        return new NoteVh(parent, clickListener, onItemPopUpMenuClickListener);
     }
 
     /*** Привязка
@@ -50,6 +57,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteVh> {
     @Override
     public void onBindViewHolder(@NonNull NoteVh holder, int position) {
         holder.bind(getItem(position));
+
     }
 
     /*** Возращает позицию элемента
