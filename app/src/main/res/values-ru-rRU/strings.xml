@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Заметки</string>
+    <string name="make_note">Создать заметку</string>
+    <string name="title_edit_text">Заголовок</string>
+    <string name="description_edit_text">Текст заметки</string>
+    <string name="save_button_text">Сохранить</string>
+    <string name="delete_button_text">Удалить</string>
+</resources>
