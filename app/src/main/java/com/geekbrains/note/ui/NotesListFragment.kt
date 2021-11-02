@@ -1,92 +1,64 @@
-package com.geekbrains.note.ui;
+package com.geekbrains.note.ui
 
-import static com.geekbrains.note.ui.StartActivity.LOG_TAG;
+import android.content.res.Configuration
+import android.os.Bundle
+import android.util.Log
+import android.view.*
+import com.geekbrains.note.io.IoAdapter
+import com.geekbrains.note.io.SaveFile
+import com.geekbrains.note.domain.NotesApp
+import com.geekbrains.note.R
+import com.geekbrains.note.domain.NoteEntity
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.geekbrains.note.impl.NotesRepoImpl
 
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultListener;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.geekbrains.note.R;
-import com.geekbrains.note.domain.NoteEntity;
-import com.geekbrains.note.domain.NotesApp;
-import com.geekbrains.note.impl.NotesRepoImpl;
-import com.geekbrains.note.io.IoAdapter;
-import com.geekbrains.note.io.SaveFile;
-
-public class NotesListFragment extends Fragment {
-
-    private FragmentManager fragmentManager;
-    public static NotesRepoImpl notesRepo;
-
-    private final NotesAdapter adapter = new NotesAdapter(); // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
-
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-
-        setHasOptionsMenu(true);
-        initNoteRepoFromMyApp();
-        if (getApp().getAppNotesRepo().getNotes().isEmpty()) {
-            new IoAdapter().readFromFile(SaveFile.readFromFile(requireActivity().getApplicationContext()));
+class NotesListFragment : Fragment() {
+    private lateinit var notesFragmentManager: FragmentManager
+    private val adapter = NotesAdapter() // сущность, которая "мапит" (отображает) значения. Превращает сущности во вьюшки.
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
+        initNoteRepoFromMyApp()
+        if (app.appNotesRepo.notes.isEmpty()) {
+            IoAdapter().readFromFile(SaveFile.readFromFile(requireActivity().applicationContext))
         }
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        super.onCreate(savedInstanceState)
+        retainInstance = true
     }
 
-
-    private void initNoteRepoFromMyApp() {
-        notesRepo = getApp().getAppNotesRepo();
+    private fun initNoteRepoFromMyApp() {
+        notesRepo = app.appNotesRepo
     }
 
-    public NotesApp getApp() {
-        return (NotesApp) requireActivity().getApplication();
+    val app: NotesApp
+        get() = requireActivity().application as NotesApp
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d(StartActivity.LOG_TAG, "onCreateView.   savedInstanceState = $savedInstanceState")
+        return inflater.inflate(R.layout.fragment_notes_list, container, false)
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "onCreateView.   savedInstanceState = " + savedInstanceState);
-        return inflater.inflate(R.layout.fragment_notes_list, container, false);
+    override fun onResume() {
+        Log.d(StartActivity.LOG_TAG, "onResume.")
+        notesFragmentManager = requireActivity().supportFragmentManager
+        initToolbar()
+        initRecycler()
+        super.onResume()
     }
 
-    @Override
-    public void onResume() {
-        Log.d(LOG_TAG, "onResume.");
-        fragmentManager = requireActivity().getSupportFragmentManager();
-        initToolbar();
-        initRecycler();
-
-        super.onResume();
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d(StartActivity.LOG_TAG, "onViewCreated.   savedInstanceState = $savedInstanceState")
+        notesFragmentManager = requireActivity().supportFragmentManager
+        initToolbar()
+        initRecycler()
+        dataFromNoteEditFragment()
+        super.onViewCreated(view, savedInstanceState)
     }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "onViewCreated.   savedInstanceState = " + savedInstanceState);
-        fragmentManager = requireActivity().getSupportFragmentManager();
-        initToolbar();
-        initRecycler();
-        dataFromNoteEditFragment();
-        super.onViewCreated(view, savedInstanceState);
-
-    }
-
 
     /*** Чтобы наш активити узнал о существовании меню.
      * Создание меню.
@@ -96,10 +68,9 @@ public class NotesListFragment extends Fragment {
      * @param inflater
      * @return
      */
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.notes_list_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.notes_list_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     /***Реакция на нажатие кнопки меню.
@@ -108,139 +79,125 @@ public class NotesListFragment extends Fragment {
      * @param item
      * @return
      */
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.new_note_menu) {
-            openNoteScreen(null);
-            return true;
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.new_note_menu) {
+            openNoteScreen(null)
+            return true
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
 
     /*** Запуск NoteEditFragment активити
      *
      * @param item
      */
-    private void openNoteScreen(@Nullable NoteEntity item) {
-        int container;
-        if (!checkOrientation()) {
-            container = R.id.fragment_container_main;
+    private fun openNoteScreen(item: NoteEntity?) {
+        val container: Int = if (!checkOrientation()) {
+            R.id.fragment_container_main
         } else {
-            container = R.id.fragment_container_note_edit;
+            R.id.fragment_container_note_edit
         }
-        Log.d(LOG_TAG, "NotesListFragment  openNoteScreen." + container);
-        Bundle result = new Bundle();
-        result.putParcelable(NoteEditFragment.IN_NOTE_ENTITY_KEY, item);
-        fragmentManager.setFragmentResult(NoteEditFragment.IN_DATA_KEY, result);
-        fragmentManager
+        Log.d(StartActivity.LOG_TAG, "NotesListFragment  openNoteScreen.$container")
+        val result = Bundle()
+        result.putParcelable(NoteEditFragment.IN_NOTE_ENTITY_KEY, item)
+        notesFragmentManager.setFragmentResult(NoteEditFragment.IN_DATA_KEY, result)
+        notesFragmentManager
                 .beginTransaction()
-                .replace(container, new NoteEditFragment())
+                .replace(container, NoteEditFragment())
                 .addToBackStack(null)
-                .commit();
+                .commit()
     }
 
-    private boolean checkOrientation() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    private fun checkOrientation(): Boolean {
+        return resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     }
 
-    private void dataFromNoteEditFragment() {
-        Log.d(LOG_TAG, "NotesListFragment  dataFromNoteEditFragment.");
-        fragmentManager.setFragmentResultListener(NoteEditFragment.BACK_DATA_KEY, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                NoteEntity noteEntity = result.getParcelable(NoteEditFragment.NOTE_ENTITY_KEY);
-                int operationType = result.getInt(NoteEditFragment.TYPE_OPERATION_KEY);
-                if (operationType == 1)
-                    saveNoteEntity(noteEntity);
-                else if (operationType == 2)
-                    deleteNoteEntity(noteEntity);
-            }
-        });
+    private fun dataFromNoteEditFragment() {
+        Log.d(StartActivity.LOG_TAG, "NotesListFragment  dataFromNoteEditFragment.")
+        notesFragmentManager.setFragmentResultListener(NoteEditFragment.BACK_DATA_KEY, this, { _, result ->
+            val noteEntity: NoteEntity? = result.getParcelable(NoteEditFragment.NOTE_ENTITY_KEY)
+            val operationType = result.getInt(NoteEditFragment.TYPE_OPERATION_KEY)
+            if (operationType == 1) saveNoteEntity(noteEntity) else if (operationType == 2) deleteNoteEntity(noteEntity)
+        })
     }
 
-
-    private void saveNoteEntity(NoteEntity noteEntity) {
-        if (noteEntity.getId() == 0) {
-            getApp().getAppNotesRepo().createNote(noteEntity);
-            SaveFile.writeToFile(new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(), noteEntity.getDescription()), getActivity().getApplicationContext(), true);
+    private fun saveNoteEntity(noteEntity: NoteEntity?) {
+        if (noteEntity!!.id == 0) {
+            app.appNotesRepo.createNote(noteEntity)
+            SaveFile.writeToFile(IoAdapter().saveToFile(noteEntity.id, noteEntity.title, noteEntity.description), activity?.applicationContext, true)
         } else {
-            getApp().getAppNotesRepo().updateNote(noteEntity.getId(), noteEntity);
-            SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
+            app.appNotesRepo.updateNote(noteEntity.id, noteEntity)
+            SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().applicationContext, false)
         }
     }
 
-    private void deleteNoteEntity(NoteEntity noteEntity) {
-        getApp().getAppNotesRepo().deleteNote(noteEntity.getId());
-        SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().getApplicationContext(), false);
+    private fun deleteNoteEntity(noteEntity: NoteEntity?) {
+        app.appNotesRepo.deleteNote(noteEntity!!.id)
+        SaveFile.writeToFile(SaveFile.updateFile(), requireActivity().applicationContext, false)
     }
-
 
     /*** Инициализация recyclerView
      * recyclerView состоит из сам recyclerView, адаптер и вьюшки
      */
-    private void initRecycler() {
-        RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext())); // способ расположение заметок в recyclerView друг относительно друга (вертикальный список)
-        recyclerView.setAdapter(adapter); // определяем адаптер
-        adapter.setOnItemClickListener(NotesListFragment.this::onItemClick); // слушатель на нажатие говорит какой метод дальше использовать
-        adapter.setOnItemClickListenerPopUpMenu(this::onPopupButtonClick);
-        adapter.setData(getApp().getAppNotesRepo().getNotes()); // передаём данные из репозитория в адаптер
-        Log.d(LOG_TAG, "initRecycler.   notesRepo = " + getApp().getAppNotesRepo());
+    private fun initRecycler() {
+        val recyclerView: RecyclerView = requireView().findViewById(R.id.recycler_view)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext()) // способ расположение заметок в recyclerView друг относительно друга (вертикальный список)
+        recyclerView.adapter = adapter // определяем адаптер
+        adapter.setOnItemClickListener { item: NoteEntity -> onItemClick(item) } // слушатель на нажатие говорит какой метод дальше использовать
+        adapter.setOnItemClickListenerPopUpMenu { menuItem: MenuItem, noteEntity: NoteEntity? -> onPopupButtonClick(menuItem, noteEntity) }
+        adapter.setData(app.appNotesRepo.notes) // передаём данные из репозитория в адаптер
+        Log.d(StartActivity.LOG_TAG, "initRecycler.   notesRepo = " + app.appNotesRepo)
     }
 
-
-    public void onPopupButtonClick(MenuItem menuItem, NoteEntity noteEntity) {
-        switch (menuItem.getItemId()) {
-            case R.id.popup_menu_item_delete:
-                deleteNoteEntity(noteEntity);
-                initRecycler();
-                break;
-            case R.id.popup_menu_item_duplicate:
-                Toast.makeText(getContext(), "Дублирование заметки", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.popup_menu_item_fil_repo:
-                fillRepoByTestValues();
-                Toast.makeText(getContext(), "Данные записаны в файл. Перезапустите програму", Toast.LENGTH_SHORT).show();
-                break;
+    private fun onPopupButtonClick(menuItem: MenuItem, noteEntity: NoteEntity?) {
+        when (menuItem.itemId) {
+            R.id.popup_menu_item_delete -> {
+                deleteNoteEntity(noteEntity)
+                initRecycler()
+            }
+            R.id.popup_menu_item_duplicate -> Toast.makeText(context, "Дублирование заметки", Toast.LENGTH_SHORT).show()
+            R.id.popup_menu_item_fil_repo -> {
+                fillRepoByTestValues()
+                Toast.makeText(context, "Данные записаны в файл. Перезапустите програму", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     /*** Инициализация Toolbar
      *
      */
-    private void initToolbar() {
-        Toolbar toolbar = getView().findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
+    private fun initToolbar() {
+        val toolbar: Toolbar = requireView().findViewById(R.id.toolbar)
+        (activity as AppCompatActivity?)!!.setSupportActionBar(toolbar)
     }
 
     /*** Реакция на нажатие элемента списка
      *
      * @param item - конкретная заметка, на которую нажали
      */
-    private void onItemClick(NoteEntity item) {
-        openNoteScreen(item);
+    private fun onItemClick(item: NoteEntity) {
+        openNoteScreen(item)
     }
-
 
     /*** Временное наполнение репозитория заметками
      * создаём и тут же записываем в репозиторий
      */
-    private void fillRepoByTestValues() {
-        SaveFile.writeToFile(new IoAdapter().saveToFile(0, "Заметка 1", "Октябрь уж наступил — уж роща отряхает"), requireActivity().getApplicationContext(), false);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(1, "Заметка 2", "Последние листы с нагих своих ветвей;"), requireActivity().getApplicationContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(2, "Заметка 3", "Дохнул осенний хлад — дорога промерзает."), requireActivity().getApplicationContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(3, "Заметка 4", "Журча еще бежит за мельницу ручей,"), requireActivity().getApplicationContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(4, "Заметка 5", "Но пруд уже застыл; сосед мой поспешает"), requireActivity().getApplicationContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(5, "Заметка 6", "В отъезжие поля с охотою своей,"), requireActivity().getApplicationContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(6, "Заметка 7", "И страждут озими от бешеной забавы,"), requireActivity().getApplicationContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(7, "Заметка 8", "И будит лай собак уснувшие дубравы."), requireActivity().getApplicationContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(8, "Заметка 9", "Теперь моя пора: я не люблю весны;"), requireActivity().getApplicationContext(), true);
-        SaveFile.writeToFile(new IoAdapter().saveToFile(9, "Заметка 10", "Скучна мне оттепель; вонь, грязь — весной я болен;"), requireActivity().getApplicationContext(), true);
-
-        SaveFile.readFromFile(requireActivity().getApplicationContext());
-
+    private fun fillRepoByTestValues() {
+        SaveFile.writeToFile(IoAdapter().saveToFile(0, "Заметка 1", "Октябрь уж наступил — уж роща отряхает"), requireActivity().applicationContext, false)
+        SaveFile.writeToFile(IoAdapter().saveToFile(1, "Заметка 2", "Последние листы с нагих своих ветвей;"), requireActivity().applicationContext, true)
+        SaveFile.writeToFile(IoAdapter().saveToFile(2, "Заметка 3", "Дохнул осенний хлад — дорога промерзает."), requireActivity().applicationContext, true)
+        SaveFile.writeToFile(IoAdapter().saveToFile(3, "Заметка 4", "Журча еще бежит за мельницу ручей,"), requireActivity().applicationContext, true)
+        SaveFile.writeToFile(IoAdapter().saveToFile(4, "Заметка 5", "Но пруд уже застыл; сосед мой поспешает"), requireActivity().applicationContext, true)
+        SaveFile.writeToFile(IoAdapter().saveToFile(5, "Заметка 6", "В отъезжие поля с охотою своей,"), requireActivity().applicationContext, true)
+        SaveFile.writeToFile(IoAdapter().saveToFile(6, "Заметка 7", "И страждут озими от бешеной забавы,"), requireActivity().applicationContext, true)
+        SaveFile.writeToFile(IoAdapter().saveToFile(7, "Заметка 8", "И будит лай собак уснувшие дубравы."), requireActivity().applicationContext, true)
+        SaveFile.writeToFile(IoAdapter().saveToFile(8, "Заметка 9", "Теперь моя пора: я не люблю весны;"), requireActivity().applicationContext, true)
+        SaveFile.writeToFile(IoAdapter().saveToFile(9, "Заметка 10", "Скучна мне оттепель; вонь, грязь — весной я болен;"), requireActivity().applicationContext, true)
+        SaveFile.readFromFile(requireActivity().applicationContext)
     }
 
-
+    companion object {
+        @JvmField
+        var notesRepo: NotesRepoImpl? = null
+    }
 }
