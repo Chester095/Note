@@ -1,11 +1,10 @@
 package com.geekbrains.note.io;
 
-import static com.geekbrains.note.ui.NotesListFragment.notesRepo;
-
 import android.content.Context;
 import android.util.Log;
 
 import com.geekbrains.note.domain.NoteEntity;
+import com.geekbrains.note.ui.NotesListFragment;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -17,7 +16,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class SaveFile {
+public class SaveFile{
 
     static final String LOG_TAG = "@@@";
     static final String FILENAME = "file.txt";
@@ -51,7 +50,7 @@ public class SaveFile {
 
     public static String updateFile() {
         String temp = "";
-        List<NoteEntity> data = notesRepo.getNotes();
+        List<NoteEntity> data = NotesListFragment.notesRepo.getNotes();
         for (NoteEntity noteEntity : data) {
             temp += new IoAdapter().saveToFile(noteEntity.getId(), noteEntity.getTitle(), noteEntity.getDescription());
         }
